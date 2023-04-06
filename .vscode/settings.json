@@ -1,0 +1,15 @@
+{
+    "cSpell.language": "en,de",
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "on",
+    "editor.rulers": [
+        80,
+        120
+    ],
+    "cSpell.words": [
+        "DHBW",
+        "openapi",
+        "Richert",
+        "yannickkirschen"
+    ],
+}
