@@ -60,3 +60,44 @@ is described by the following attributes in JSON notation:
   "state": "waiting/playing/finished"
 }
 ```
+
+## Server 
+
+### API
+- /join/:id   {name: String}
+- /leave/:id
+- /kill/:game {auth: ?} 
+  auth is required to ensure that the user is allowed to kill the game (i.e. is mod)
+- /start/:id {auth: ?}
+
+### Socket
+Game logic is handled by the server. 
+The client only needs to know his role (cardTsar yes/no), his hand, the card in the center, the current status (e.g. able to play a card, waiting for others to play their cards) as well as his current options.
+Each request should come with a gameID to allow handling of multiple games simultaneously.
+From server to all clients of one game:
+- killConfirm()
+- updateGameState()
+  type:
+  - handUpdate: changes cards of the player
+  - tableCardUpate: changes black card displayed
+  - invisibleHandsUpdate: updates the display, if the other players have played their cards (without showing the cards)
+  - gameState: able to play a card, waiting for others, cardTsar, etc. (maybe find a better name)
+  - scoreBoard: update points, etc.
+- updateActions()
+  type:
+  - playBlackCard
+  - playWhiteCard
+  - chooseWinningCard
+  - toggleShuffleAvailability
+- updateReqAckknowledged()
+- ping()
+  to check if all players are still connected
+- playerUpdate()
+  if a visual aid is implemented to indicate the number of players in the current round, it should be updated following this broadcast
+
+From clients to server:
+- killRequest()
+- updateGameStateReq()
+  type: play card, choose winnerCard, shuffleCards, skipNextRoundTimer (while viewing the game after the Card Tsar chose the winning card)
+  value: played card
+- pingAck()
