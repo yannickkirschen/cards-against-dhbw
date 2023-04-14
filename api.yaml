@@ -10,16 +10,55 @@ servers:
       description: Local server
 
 paths:
-    /hello:
+    /new:
         get:
-            summary: Returns hello world
-            description: Just a first endpoint
-            operationId: hello
+            summary: Create a new game
+            description: Create a new game
+            operationId: new
+
             responses:
                 "200":
-                    description: A string containing hello world
+                    description: Metadata for a new game
                     content:
-                        plain/text:
+                        application/json:
                             schema:
-                                type: string
-                                example: hello, world
+                                $ref: "#/components/schemas/Game"
+
+    /join/{id}:
+        get:
+            summary: Join a game
+            description: Join a game
+            operationId: join
+
+            parameters:
+                - name: id
+                  in: path
+                  description: Game ID
+                  required: true
+                  schema:
+                      type: string
+
+            responses:
+                "200":
+                    description: Metadata for the game containing the player's ID
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Game"
+
+components:
+    schemas:
+        Game:
+            type: object
+            description: Data for a new game.
+
+            properties:
+                id:
+                    type: string
+                    description: Game identifier used to join the game.
+                    example: d84nt8
+
+                playerId:
+                    type: string
+                    description: Player ID.
+                    example: UGV0ZXI=
