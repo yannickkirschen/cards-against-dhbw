@@ -8,6 +8,22 @@ This project is part of the lecture *Web Engineering 2* and is a clone of the po
 - [yannickkirschen](https://github.com/yannickkirschen)
 - [MalteRichert](https://github.com/MalteRichert)
 
+## Features
+
+- Multiplayer web application for playing the game *Cards against DHBW*.
+- The Master of Desaster (MOD) can create a game and start it. They receive a unique game code that can be shared with other players.
+- Players can join a game by entering the game code.
+- Players can choose a unique name.
+- The MOD can start the game after players have joined the lobby.
+- When a game is started, nobody can join the game anymore.
+- Every player holds ten white cards.
+- If a player doesn't like their cards, they can remove them individually before the round ends and receive new ones the next round.
+- Each round presents a black card with a question or a sentence with blanks.
+- Players except the Boss can play white cards to fill the blanks.
+- Once every player chose their cards, the Boss chooses the funniest card to win the round.
+- The player who won the round gets a point.
+- The game ends when a player reaches ten points or the MOD closes the game or all players leave the game.
+
 ## Data Model
 
 ### Card
@@ -61,20 +77,23 @@ is described by the following attributes in JSON notation:
 }
 ```
 
-## Server 
+## Server
 
 ### API
+
 - /join/:id   {name: String}
 - /leave/:id
-- /kill/:game {auth: ?} 
+- /kill/:game {auth: ?}
   auth is required to ensure that the user is allowed to kill the game (i.e. is mod)
 - /start/:id {auth: ?}
 
 ### Socket
-Game logic is handled by the server. 
+
+Game logic is handled by the server.
 The client only needs to know his role (cardTsar yes/no), his hand, the card in the center, the current status (e.g. able to play a card, waiting for others to play their cards) as well as his current options.
 Each request should come with a gameID to allow handling of multiple games simultaneously.
 From server to all clients of one game:
+
 - killConfirm()
 - updateGameState()
   type:
@@ -96,6 +115,7 @@ From server to all clients of one game:
   if a visual aid is implemented to indicate the number of players in the current round, it should be updated following this broadcast
 
 From clients to server:
+
 - killRequest()
 - updateGameStateReq()
   type: play card, choose winnerCard, shuffleCards, skipNextRoundTimer (while viewing the game after the Card Tsar chose the winning card)
