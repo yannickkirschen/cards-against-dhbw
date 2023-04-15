@@ -6,6 +6,16 @@ package model
 //      -> BossHasChosenState                       --|
 //      -> LobbyState (Kind: WinnerLobbyState)
 
+type InvalidCodeState struct {
+	Kind string `json:"kind"`
+}
+
+type JoinReqAction struct {
+	Kind     string `json:"kind"`
+	GameID   string `json:"gameID"`
+	PlayerID string `json:"playerID"`
+}
+
 type LobbyState struct {
 	Kind    string          `json:"kind"`
 	Players []*PublicPlayer `json:"players"`
