@@ -5,7 +5,11 @@ import (
 	"net/http"
 
 	"github.com/yannickkirschen/cards-against-dhbw/config"
+	"github.com/yannickkirschen/cards-against-dhbw/model"
 )
+
+var GlobalWhiteCards []model.Card
+var GlobalBlackCards []model.Card
 
 func main() {
 	err := config.InitConfig()
