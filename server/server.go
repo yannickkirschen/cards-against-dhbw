@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"encoding/json"
@@ -12,6 +12,7 @@ import (
 	"github.com/googollee/go-socket.io/engineio/transport"
 	"github.com/googollee/go-socket.io/engineio/transport/polling"
 	"github.com/googollee/go-socket.io/engineio/transport/websocket"
+	"github.com/yannickkirschen/cards-against-dhbw/db"
 	"github.com/yannickkirschen/cards-against-dhbw/model"
 )
 
@@ -57,9 +58,9 @@ func InitServerSession() {
 
 		getGamePlayFromGameID(p.GameID).RecvMessage(p.PlayerID, "joinRequestAction", msg)
 
-		var wcards []*model.Card = GlobalWhiteCards[0:4]
+		var wcards []*model.Card = db.GlobalWhiteCards[0:4]
 		var pl []*model.PublicPlayer = make([]*model.PublicPlayer, 0)
-		var state model.PlayerChoosingState = model.PlayerChoosingState{Kind: "None", BlackCard: GlobalBlackCards[0], WhiteCards: wcards, Players: pl}
+		var state model.PlayerChoosingState = model.PlayerChoosingState{Kind: "None", BlackCard: db.GlobalBlackCards[0], WhiteCards: wcards, Players: pl}
 		s.Emit("playerChoosingState", state)
 
 	})

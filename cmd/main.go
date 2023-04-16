@@ -1,23 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 
 	"github.com/yannickkirschen/cards-against-dhbw/config"
-
-	"github.com/yannickkirschen/cards-against-dhbw/model"
+	"github.com/yannickkirschen/cards-against-dhbw/db"
 )
-
-var GlobalWhiteCards []*model.Card
-var GlobalBlackCards []*model.Card
 
 func main() {
 	err := config.InitConfig()
 	if err != nil {
 		panic(err)
 	}
-	readCards()
+	db.ReadCards()
 	http.HandleFunc("/v1/hello", getHello)
 
 	fmt.Println(http.ListenAndServe(fmt.Sprintf(":%d", config.DhbwConfig.Port), nil))

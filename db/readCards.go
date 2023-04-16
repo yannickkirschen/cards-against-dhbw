@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"encoding/json"
@@ -8,7 +8,10 @@ import (
 	"github.com/yannickkirschen/cards-against-dhbw/model"
 )
 
-func readCards() {
+var GlobalWhiteCards []*model.Card
+var GlobalBlackCards []*model.Card
+
+func ReadCards() {
 	log.Println("----starting to read cards from json-file----")
 	cardData, readingError := ioutil.ReadFile("db/cards.json")
 	if readingError != nil {
