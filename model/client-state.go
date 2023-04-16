@@ -8,54 +8,37 @@ package model
 //      -> LobbyState (Kind: WinnerLobbyState)
 
 type JoinRequestAction struct {
-	Kind     string `json:"kind"`
 	GameID   string `json:"gameID"`
 	PlayerID string `json:"playerID"`
 }
 
-type InvalidCodeState struct {
-	Kind string `json:"kind"`
-}
+type InvalidState struct{}
 
 type LobbyState struct {
-	Kind    string          `json:"kind"`
 	Players []*PublicPlayer `json:"players"`
 }
 
-type StartGameAction struct {
-	Kind string `json:"kind"`
-}
+type StartGameAction struct{}
 
 type PlayerChoosingState struct {
-	Kind       string          `json:"kind"`
 	Players    []*PublicPlayer `json:"players"`
 	BlackCard  *Card           `json:"blackCard"`
 	WhiteCards []*Card         `json:"whiteCards"`
 }
 
 type CardChosenAction struct {
-	Kind string `json:"kind"`
 	Card string `json:"card"`
 }
 
-type BossWaitingState struct {
-	Kind              string          `json:"kind"`
-	Players           []*PublicPlayer `json:"players"`
-	BlackCard         *Card           `json:"blackCard"`
-	NumberPlayedCards int             `json:"numberPlayedCards"`
-}
-
 type BossHasChosenState struct {
-	Kind        string                  `json:"kind"`
-	Players     []*PublicPlayer         `json:"players"`
-	BlackCard   *Card                   `json:"blackCard"`
-	WinnerCard  *Card                   `json:"winnerCard"`
-	PlayedCards map[*PublicPlayer]*Card `json:"playedCards"`
+	Players     []*PublicPlayer `json:"players"`
+	BlackCard   *Card           `json:"blackCard"`
+	Winner      string          `json:"winner"`
+	WinnerCard  string          `json:"winnerCard"`
+	PlayedCards []*Card         `json:"playedCards"`
 }
 
-type LeaveGameAction struct {
-	Kind string `json:"kind"`
-}
+type LeaveGameAction struct{}
 
 // MOD
 // Visit example.com
