@@ -1,10 +1,21 @@
 package model
 
+//    JoinRequestAction (on error: InvalidCodeState)
 //    LobbyState (Kind: WaitingLobbyState)
 //      -> PlayerPlayingState && BossWaitingState   <-|
 //      -> BossChoosingState                          |
 //      -> BossHasChosenState                       --|
 //      -> LobbyState (Kind: WinnerLobbyState)
+
+type JoinRequestAction struct {
+	Kind     string `json:"kind"`
+	GameID   string `json:"gameID"`
+	PlayerID string `json:"playerID"`
+}
+
+type InvalidCodeState struct {
+	Kind string `json:"kind"`
+}
 
 type LobbyState struct {
 	Kind    string          `json:"kind"`
@@ -19,10 +30,10 @@ type PlayerChoosingState struct {
 	Kind       string          `json:"kind"`
 	Players    []*PublicPlayer `json:"players"`
 	BlackCard  *Card           `json:"blackCard"`
-	WhiteCards [10]*Card       `json:"whiteCards"`
+	WhiteCards []*Card         `json:"whiteCards"`
 }
 
-type PlayerHasChosenAction struct {
+type CardChosenAction struct {
 	Kind string `json:"kind"`
 	Card string `json:"card"`
 }
@@ -32,18 +43,6 @@ type BossWaitingState struct {
 	Players           []*PublicPlayer `json:"players"`
 	BlackCard         *Card           `json:"blackCard"`
 	NumberPlayedCards int             `json:"numberPlayedCards"`
-}
-
-type BossChoosingState struct {
-	Kind        string          `json:"kind"`
-	Players     []*PublicPlayer `json:"players"`
-	BlackCard   *Card           `json:"blackCard"`
-	PlayedCards []*Card         `json:"playedCards"`
-}
-
-type BossHasChosenAction struct {
-	Kind string `json:"kind"`
-	Card string `json:"card"`
 }
 
 type BossHasChosenState struct {
