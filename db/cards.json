@@ -1,0 +1,62 @@
+[
+    {
+        "id": "f1b6d328c6f92e05d4de67addc8e7d4d",
+        "text": "Hofi",
+        "type": 1
+    },
+    {
+        "id": "7bb5e0d60a9aeb5694a34d56de324a8f",
+        "text": "Was hebt die Stimmung in jeder Vorlesung?",
+        "type": 0
+    },
+    {
+        "id": "ec176b8dc773b71f1e3f74c788e19228",
+        "text": "Die ewige Baustelle am Campus",
+        "type": 1
+    },
+    {
+        "id": "74c76e44e50a9e9aee0f3059550b8d01",
+        "text": "Der berüchtigte Mathe-Prof",
+        "type": 1
+    },
+    {
+        "id": "d76bfce29a7fa40d6a2667276f45530c",
+        "text": "Die Kampagne für mehr Toilettenpapier",
+        "type": 0
+    },
+    {
+        "id": "c3e2b4c5e5d5b5c5aa5fcaaf5c4ad4a1",
+        "text": "Die Suche nach einem freien Parkplatz",
+        "type": 0
+    },
+    {
+        "id": "6e12db84c72a6bfedc6e8e7b37a924ef",
+        "text": "Der Versuch, eine Antwort auf die Frage 'Was ist Duales Studium?' zu finden",
+        "type": 0
+    },
+    {
+        "id": "e277f3709a9ecbeab68e1008df1d34dd",
+        "text": "Das Ende der Mensa-Schlange",
+        "type": 1
+    },
+    {
+        "id": "1f9daa6b8192e50b5c5b2f5cb5f5bc5b",
+        "text": "Die Vorlesung, bei der der Prof nur seinen Laptopbildschirm zeigt",
+        "type": 0
+    },
+    {
+        "id": "0dd0f4151986ba8d0b37c4733c86a9e5",
+        "text": "Das Warten auf eine Antwort vom Studienbüro",
+        "type": 0
+    },
+    {
+        "id": "e3a90571d3b3b76fae02c1c25d83f605",
+        "text": "Die ungeschriebene Regel, dass man im Fahrstuhl nicht redet",
+        "type": 1
+    },
+    {
+        "id": "88923655e2f39a77aebcc32a1cc8fca6",
+        "text": "Die Vorlesung, bei der man sich wünscht, man hätte Kaffee getrunken",
+        "type": 0
+    }
+]

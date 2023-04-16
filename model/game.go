@@ -22,3 +22,11 @@ type Game struct {
 	// The state of the game.
 	State *State `json:"state"`
 }
+
+func (this *Game) RecvMessage(playerID string, msgType string, msg string) string {
+	return "success"
+}
+
+func (this *Game) SetResponder(playerID string, responder func(s string, s2 ...interface{})) {
+	return
+}
