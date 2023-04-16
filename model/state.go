@@ -18,3 +18,37 @@ type State struct {
 	// than the round counter, a white card is being chosen by the Boss.
 	Round int `json:"round"`
 }
+
+type PublicPlayer struct {
+	Name   string `json:"name"`
+	IsMod  bool   `json:"isMod"`
+	IsBoss bool   `json:"isBoss"`
+	Points int    `json:"points"`
+}
+
+func (s *State) GetPlayedCards() []*Card {
+	cards := make([]*Card, len(s.PlayedCards))
+	for _, v := range s.PlayedCards {
+		cards = append(cards, v)
+	}
+	return cards
+}
+
+func (s *State) AllCardsPlayed() bool {
+	for _, v := range s.PlayedCards {
+		if v == nil {
+			return false
+		}
+	}
+	return true
+}
+
+func (s *State) WhoPlayed(cardId string) *Player {
+	for player, card := range s.PlayedCards {
+		if card.ID == cardId {
+			return player
+		}
+	}
+
+	return nil
+}

@@ -13,6 +13,7 @@ import (
 	"github.com/googollee/go-socket.io/engineio/transport/polling"
 	"github.com/googollee/go-socket.io/engineio/transport/websocket"
 	"github.com/yannickkirschen/cards-against-dhbw/db"
+	"github.com/yannickkirschen/cards-against-dhbw/game"
 	"github.com/yannickkirschen/cards-against-dhbw/model"
 )
 
@@ -29,7 +30,7 @@ func getGamePlayFromGameID(gameID string) *model.Game {
 	return nil
 }
 
-func InitServerSession() {
+func InitServerSession() *socket.Server {
 
 	server := socket.NewServer(&engineio.Options{
 		Transports: []transport.Transport{
@@ -51,16 +52,16 @@ func InitServerSession() {
 	server.OnEvent("/", "joinRequestAction", func(s socket.Conn, msg string) {
 		var p model.JoinRequestAction
 		json.Unmarshal([]byte(msg), &p)
-		logRequest(p, "joinRequestAction")
+		logRequest(p, "game.join")
 		s.SetContext(p)
 		// TODO check if game exists. If not, emit invalidCode stuff
-		getGamePlayFromGameID(p.GameID).SetResponder(p.PlayerID, s.Emit)
+		game.GlobalGameShelf.Games[p.GameID].AddSender(p.PlayerID, s.Emit)
 
-		getGamePlayFromGameID(p.GameID).RecvMessage(p.PlayerID, "joinRequestAction", msg)
+		game.GlobalGameShelf.Games[p.GameID].ReceiveMessage(p.PlayerID, "game.join", msg)
 
 		var wcards []*model.Card = db.GlobalWhiteCards[0:4]
 		var pl []*model.PublicPlayer = make([]*model.PublicPlayer, 0)
-		var state model.PlayerChoosingState = model.PlayerChoosingState{Kind: "None", BlackCard: db.GlobalBlackCards[0], WhiteCards: wcards, Players: pl}
+		var state model.PlayerChoosingState = model.PlayerChoosingState{BlackCard: db.GlobalBlackCards[0], WhiteCards: wcards, Players: pl}
 		s.Emit("playerChoosingState", state)
 
 	})
@@ -68,9 +69,9 @@ func InitServerSession() {
 	server.OnEvent("/", "startGameAction", func(s socket.Conn, msg string) {
 		var p model.JoinRequestAction = s.Context().(model.JoinRequestAction)
 
-		logRequest(p, "startGameAction")
+		logRequest(p, "game.start")
 
-		getGamePlayFromGameID(p.GameID).RecvMessage(p.PlayerID, "startGameAction", msg)
+		getGamePlayFromGameID(p.GameID).RecvMessage(p.PlayerID, "game.start", msg)
 	})
 
 	server.OnEvent("/", "cardChosenAction", func(s socket.Conn, msg string) {
@@ -107,9 +108,6 @@ func InitServerSession() {
 	})
 
 	go server.Serve()
-	defer server.Close()
 
-	http.Handle("/socket.io/", server)
-	log.Println("Serving at localhost:8000...")
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	return server
 }
