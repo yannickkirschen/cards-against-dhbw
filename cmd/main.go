@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/yannickkirschen/cards-against-dhbw/config"
+
 	"github.com/yannickkirschen/cards-against-dhbw/model"
 )
 
@@ -16,11 +17,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	//http.HandleFunc("/v1/hello", getHello)
-
 	readCards()
-	InitServerSession()
+	http.HandleFunc("/v1/hello", getHello)
+
+	fmt.Println(http.ListenAndServe(fmt.Sprintf(":%d", config.DhbwConfig.Port), nil))
 
 }
 
