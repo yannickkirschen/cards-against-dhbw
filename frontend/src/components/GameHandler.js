@@ -5,22 +5,27 @@ import { GameCard, CardColor, Player } from "./dataStructure";
 import ListPlayer from './ListPlayer'
 import ListCards from './ListCards'
 import { Link } from "react-router-dom";
+import { Button } from "@mui/material";
 
 
 export default class GameHandler extends Component {
+    constructor() {
+        super()
+        this.state = {
+            player: [],
+            whiteCards: [],
+            blackCard: new GameCard(CardColor.BLACK, "", "NONE"),
+            actionState: "invalidCode",
+            // action states are:
+            //  invalidCode - link to home enabled
+            //  playerChoosing - whiteCard buttons enabled
+            //  bossChoosing - whiteCard buttons enabled
+            //  gameWaiting - startGame button enabled
+            //  none
+        }
 
-    state = {
-        player: [],
-        whiteCards: [],
-        blackCard: new GameCard(CardColor.BLACK, "", "NONE"),
-        actionState: ""
-        // action states are:
-        //  invalidCode - link to home enabled
-        //  playerChoosing - whiteCard buttons enabled
-        //  bossChoosing - whiteCard buttons enabled
-        //  gameWaiting - startGame button enabled
-        //  none
     }
+
 
     loadPlayer(src) {
         let p = []
@@ -32,55 +37,62 @@ export default class GameHandler extends Component {
 
     loadWhiteCards(src) {
         let w = []
-        data.whiteCards.forEach(el => {
-            w.push(new GameCard(Color.WHITE, el.text, el.id))
+        src.forEach(el => {
+            w.push(new GameCard(CardColor.WHITE, el.text, el.id))
         })
         return w
     }
 
     componentDidMount() {
-        this.socket = io.connect("randomIP")
-        if (!this.socket.connected) {
-            this.setState({ actionState: "invalidCode" })
-        }
-        this.didUnMount = () => { socket.disconnect() }
-        socket.on("invalidCodeState", data => {
-            socket.disconnect()
+        console.log("component did Mount called")
+        this.socket = io.connect("http://localhost:8000")
+        this.socket.on("connect", () => {
+            this.socket.emit("joinRequestAction", JSON.stringify({ gameID: localStorage.getItem("gameID"), playerID: localStorage.getItem("playerID") }))
+        })
+        this.didUnMount = () => { this.socket.disconnect(); console.log("disconnected ") }
+        this.socket.on("invalidCodeState", data => {
+            console.log("recv: invalid code state")
+            this.socket.disconnect()
             this.setState({ actionState: "invalidCode" })
             localStorage.removeItem("gameID")
             localStorage.removeItem("playerID")
         })
-        socket.on("lobbyState", data => {
+        this.socket.on("lobbyState", data => {
+            console.log("recv: lobby state")
             this.setState({ player: this.loadPlayer(data.players), actionState: "gameWaiting" })
         })
-        socket.on("playerChoosingState", data => {
-            let b = new GameCard(Color.BLACK, data.blackCard.text, data.blackCard.id)
+        this.socket.on("playerChoosingState", data => {
+            console.log("recv: playerChoosingState state")
+            let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
             this.setState({ player: this.loadPlayer(data.players), whiteCards: this.loadWhiteCards(data.whiteCards), blackCard: b, actionState: "playerChoosing" })
         })
-        socket.on("bossWaitingState", data => {
-            let b = new GameCard(Color.BLACK, data.blackCard.text, data.blackCard.id)
+        this.socket.on("bossWaitingState", data => {
+            console.log("recv: boss waiting state")
+            let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
             let w = []
             for (let card = 0; card < data.numberPlayedCards; card++) {
-                w.push(new GameCard(Color.WHITE, "Hidden Card", "NONE"))
+                w.push(new GameCard(CardColor.WHITE, "Hidden Card", "NONE"))
             }
             this.setState({ player: this.loadPlayer(data.players), whiteCards: w, blackCard: b, actionState: "none" })
         })
-        socket.on("bossChoosingState", data => {
-            let b = new GameCard(Color.BLACK, data.blackCard.text, data.blackCard.id)
+        this.socket.on("bossChoosingState", data => {
+            console.log("recv: bossChoosingState state")
+            let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
             this.setState({ blackCard: b, whiteCards: this.loadWhiteCards(data.playedCards), player: this.loadPlayer(data.players), actionState: "bossChoosing" })
         })
-        socket.on("bossHasChosenState", data => {
+        this.socket.on("bossHasChosenState", data => {
+            console.log("recv: boss has chosen state")
             let cards = []
             data.playedCards.forEach((owner, card, map) => {
-                let nC = new GameCard(data.winnerCard.text.id == card.id ? Color.GOLDEN : Color.WHITE, card.text, card.id)
+                let nC = new GameCard(data.winnerCard.text.id == card.id ? CardColor.GOLDEN : CardColor.WHITE, card.text, card.id)
                 nC.setOwner(owner)
                 cards.push(nC)
             })
-            let b = new GameCard(Color.BLACK, data.blackCard.text, data.blackCard.id)
+            let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
 
             this.setState({ blackCard: b, player: this.loadPlayer(data.players), whiteCards: cards, actionState: "none" })
         })
-        this.socket.emit("joinReq", { gameID: localStorage.getItem("gameID"), playerID: localStorage.getItem("playerID") })
+        console.log("connection status:" + this.socket.connected);
     }
 
     onCardSelection(c) {
@@ -104,9 +116,10 @@ export default class GameHandler extends Component {
                             <ListCards cards={this.state.whiteCards} onCardSelect={this.onCardSelection} />
                             :
                             <ListCards cards={this.state.whiteCards} />}
+                        {console.log("state: " + JSON.stringify(this.state))}
                     </div>
                     <div className="gameHandler-blackCard">
-                        <ListCards card={[this.state.BlackCard]} />
+                        <ListCards cards={[this.state.blackCard]} />
                     </div>
                 </>
             )
@@ -114,6 +127,8 @@ export default class GameHandler extends Component {
         else {
             return (
                 <>
+                    <Button onClick={() => { this.socket.emit("notice", "msgTOll") }} >Click Me</Button>
+                    <Button onClick={() => { this.socket.emit("joinRequestAction", JSON.stringify({ gameID: "gello", playerID: "jello" })) }} >Click Me</Button>
                     <h2>Connection to game server failed.</h2>
                     <Link to="/">Home</Link>
                 </>

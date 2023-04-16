@@ -7,13 +7,13 @@ const newGame = async (navigate) => {
             localStorage.setItem("playerId", data.playerId)
         })
         .then(data => {
-            navigate("/" + data.id)
+            navigate("/game/" + data.id)
         })
         .catch(err => {
             console.log("caught error while fetching new game: " + err)
             localStorage.setItem("gameID", "emptyID")
             localStorage.setItem("playerID", "emptyPlayerID")
-            navigate("/emptyID")
+            navigate("/game/emptyID")
         })
 }
 
@@ -25,13 +25,13 @@ const joinGame = async (gameID, navigate) => {
             localStorage.setItem("playerID", data.playerId)
         })
         .then(data => {
-            navigate("/" + data.id)
+            navigate("/game/" + data.id)
         })
         .catch(err => {
             console.log("caught error while fetching new game: " + err)
             localStorage.setItem("gameID", "emptyID")
             localStorage.setItem("playerID", "emptyPlayerID")
-            navigate("/emptyID")
+            navigate("/game/emptyID")
         })
 }
 

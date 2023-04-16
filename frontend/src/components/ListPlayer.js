@@ -1,4 +1,4 @@
-import { List, ListItemIcon, ListItemText } from "@mui/material"
+import { List, ListItem, ListItemIcon, ListItemText } from "@mui/material"
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import StarIcon from '@mui/icons-material/Star';
 
@@ -14,6 +14,8 @@ const ListPlayer = ({ player }) => {
         </List>
     )
 }
+
+
 
 
 export default ListPlayer

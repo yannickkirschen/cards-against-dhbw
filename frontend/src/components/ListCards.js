@@ -1,4 +1,4 @@
-import { Stack } from "@mui/material"
+import { Paper, Stack } from "@mui/material"
 import { styled } from '@mui/material/styles';
 import GameCardDisplay from "./GameCardDisplay";
 
@@ -12,6 +12,7 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const ListCards = ({ cards, onCardSelect = null }) => {
+    console.log("cards: " + cards)
     return (
         <Stack direction="row">
             {cards.map(el => <Item key={el}><GameCardDisplay card={el} onClick={onCardSelect} /></Item>)}
