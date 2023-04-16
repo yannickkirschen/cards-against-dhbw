@@ -8,8 +8,8 @@ import (
 	"github.com/yannickkirschen/cards-against-dhbw/model"
 )
 
-var GlobalWhiteCards []model.Card
-var GlobalBlackCards []model.Card
+var GlobalWhiteCards []*model.Card
+var GlobalBlackCards []*model.Card
 
 func main() {
 	err := config.InitConfig()
@@ -18,6 +18,8 @@ func main() {
 	}
 
 	//http.HandleFunc("/v1/hello", getHello)
+
+	readCards()
 	InitServerSession()
 
 }

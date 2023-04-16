@@ -41,8 +41,9 @@ func InitServerSession() {
 		},
 	})
 	server.OnConnect("/", func(s socket.Conn) error {
-		s.SetContext("")
 		fmt.Println("connected:", s.ID())
+		var p model.JoinRequestAction = model.JoinRequestAction{GameID: "unregistered", PlayerID: "unregistered"}
+		s.SetContext(p)
 		return nil
 	})
 
@@ -51,10 +52,16 @@ func InitServerSession() {
 		json.Unmarshal([]byte(msg), &p)
 		logRequest(p, "joinRequestAction")
 		s.SetContext(p)
-
+		// TODO check if game exists. If not, emit invalidCode stuff
 		getGamePlayFromGameID(p.GameID).SetResponder(p.PlayerID, s.Emit)
 
 		getGamePlayFromGameID(p.GameID).RecvMessage(p.PlayerID, "joinRequestAction", msg)
+
+		var wcards []*model.Card = GlobalWhiteCards[0:4]
+		var pl []*model.PublicPlayer = make([]*model.PublicPlayer, 0)
+		var state model.PlayerChoosingState = model.PlayerChoosingState{Kind: "None", BlackCard: GlobalBlackCards[0], WhiteCards: wcards, Players: pl}
+		s.Emit("playerChoosingState", state)
+
 	})
 
 	server.OnEvent("/", "startGameAction", func(s socket.Conn, msg string) {
@@ -81,18 +88,18 @@ func InitServerSession() {
 		fmt.Println("Printing Context", msg)
 		fmt.Println("Context: ", s.Context())
 		fmt.Println("Context-Type", reflect.TypeOf(s.Context()))
-		s.Emit("reply", "have "+msg)
+
 	})
 
 	server.OnError("/", func(s socket.Conn, e error) {
-		log.Fatal("error occurred:", e)
+		log.Println("error occurred:", e.Error())
 		var p model.JoinRequestAction = s.Context().(model.JoinRequestAction)
 		logRequest(p, "errorAction")
 		getGamePlayFromGameID(p.GameID).RecvMessage(p.PlayerID, "leaveGameAction", "")
 	})
 
 	server.OnDisconnect("/", func(s socket.Conn, reason string) {
-		log.Println("connection closed: ", reason)
+		log.Println("connection ", s.ID(), " closed: ", reason)
 		var p model.JoinRequestAction = s.Context().(model.JoinRequestAction)
 		logRequest(p, "disconnectAction")
 		getGamePlayFromGameID(p.GameID).RecvMessage(p.PlayerID, "leaveGameAction", "")

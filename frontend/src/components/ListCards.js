@@ -12,10 +12,9 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const ListCards = ({ cards, onCardSelect = null }) => {
-    console.log("cards: " + cards)
     return (
         <Stack direction="row">
-            {cards.map(el => <Item key={el}><GameCardDisplay card={el} onClick={onCardSelect} /></Item>)}
+            {cards.map(el => <Item key={JSON.stringify(el)}><GameCardDisplay card={el} onCardSelect={onCardSelect} /></Item>)}
         </Stack>
     )
 }

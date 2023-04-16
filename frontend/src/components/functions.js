@@ -1,10 +1,10 @@
 
-const newGame = async (navigate) => {
-    fetch("/v1/new")
+const newGame = async (gamerName, navigate) => {
+    fetch("/v1/new?name=" + gamerName)
         .then(res => res.json())
         .then(data => {
-            localStorage.setItem("id", data.id)
-            localStorage.setItem("playerId", data.playerId)
+            localStorage.setItem("gameID", data.id)
+            localStorage.setItem("playerID", data.playerId)
         })
         .then(data => {
             navigate("/game/" + data.id)
@@ -17,8 +17,8 @@ const newGame = async (navigate) => {
         })
 }
 
-const joinGame = async (gameID, navigate) => {
-    fetch("/v1/join/" + gameID)
+const joinGame = async (gameID, gamerName, navigate) => {
+    fetch("/v1/join/" + gameID + "?name=" + gamerName)
         .then(res => res.json())
         .then(data => {
             localStorage.setItem("gameID", data.id)

@@ -14,8 +14,7 @@ func readCards() {
 	if readingError != nil {
 		log.Println("failed to read json: " + readingError.Error())
 	}
-	var data []model.Card
-	log.Println(cardData)
+	var data []*model.Card
 	err := json.Unmarshal(cardData, &data)
 
 	if err != nil {
@@ -29,7 +28,7 @@ func readCards() {
 		}
 	}
 
-	log.Println("White Cards: ")
+	/*log.Println("White Cards: ")
 	for _, card := range GlobalWhiteCards {
 		log.Println("ID:", card.ID)
 		log.Println("Text:", card.Text)
@@ -41,5 +40,7 @@ func readCards() {
 		log.Println("Text:", card.Text)
 		log.Println("------------------------")
 	}
+	*/
 	log.Println("----finished reading cards from json-file----")
+
 }

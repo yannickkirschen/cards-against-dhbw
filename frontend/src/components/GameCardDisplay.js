@@ -1,10 +1,13 @@
-import { Card, CardContent } from "@mui/material";
+import { ButtonBase, Card, CardContent } from "@mui/material";
+import { CardColor } from "./dataStructure";
 
 const GameCardDisplay = ({ card, onCardSelect = null }) => {
+    let backColor = card.color;
+    let textColor = card.color == CardColor.BLACK ? "white" : "black"
     if (onCardSelect == null) {
         return (
-            <Card color={card.color}>
-                <CardContent>
+            <Card color="primary">
+                <CardContent style={{ backgroundColor: backColor, color: textColor }}>
                     {card.content}
                 </CardContent>
             </Card>
@@ -12,10 +15,12 @@ const GameCardDisplay = ({ card, onCardSelect = null }) => {
     }
     else {
         return (
-            <Card color={card.color} onClick={() => onCardSelect(card)}>
-                <CardContent>
-                    {card.content}
-                </CardContent>
+            <Card style={{ backgroundColor: backColor, color: textColor }}>
+                <ButtonBase onClick={() => onCardSelect(card)}>
+                    <CardContent>
+                        {card.content}
+                    </CardContent>
+                </ButtonBase>
             </Card>
         )
     }
