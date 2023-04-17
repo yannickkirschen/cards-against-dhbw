@@ -12,7 +12,6 @@ import (
 	"github.com/googollee/go-socket.io/engineio/transport"
 	"github.com/googollee/go-socket.io/engineio/transport/polling"
 	"github.com/googollee/go-socket.io/engineio/transport/websocket"
-	"github.com/yannickkirschen/cards-against-dhbw/db"
 	"github.com/yannickkirschen/cards-against-dhbw/game"
 	"github.com/yannickkirschen/cards-against-dhbw/model"
 )
@@ -59,11 +58,11 @@ func InitServerSession() *socket.Server {
 
 		game.GlobalGameShelf.Games[p.GameID].ReceiveMessage(p.PlayerID, "game.join", msg)
 
-		var wcards []*model.Card = db.GlobalWhiteCards[0:4]
-		var pl []*model.PublicPlayer = make([]*model.PublicPlayer, 0)
-		var state model.PlayerChoosingState = model.PlayerChoosingState{BlackCard: db.GlobalBlackCards[0], WhiteCards: wcards, Players: pl}
-		s.Emit("playerChoosingState", state)
-
+		/*		var wcards []*model.Card = db.GlobalWhiteCards[0:4]
+				var pl []*model.PublicPlayer = make([]*model.PublicPlayer, 0)
+				var state model.PlayerChoosingState = model.PlayerChoosingState{BlackCard: db.GlobalBlackCards[0], WhiteCards: wcards, Players: pl}
+				s.Emit("playerChoosingState", state)
+		*/
 	})
 
 	server.OnEvent("/", "startGameAction", func(s socket.Conn, msg string) {
@@ -71,19 +70,25 @@ func InitServerSession() *socket.Server {
 
 		logRequest(p, "game.start")
 
-		getGamePlayFromGameID(p.GameID).RecvMessage(p.PlayerID, "game.start", msg)
+		game.GlobalGameShelf.Games[p.GameID].ReceiveMessage(p.PlayerID, "game.start", msg)
 	})
 
 	server.OnEvent("/", "cardChosenAction", func(s socket.Conn, msg string) {
 		var p model.JoinRequestAction = s.Context().(model.JoinRequestAction)
 		logRequest(p, "cardChosenAction")
-		getGamePlayFromGameID(p.GameID).RecvMessage(p.PlayerID, "cardChosenAction", msg)
+		game.GlobalGameShelf.Games[p.GameID].ReceiveMessage(p.PlayerID, "entity.card.chosen", msg)
+	})
+
+	server.OnEvent("/", "bossContinueAction", func(s socket.Conn, msg string) {
+		var p model.JoinRequestAction = s.Context().(model.JoinRequestAction)
+		logRequest(p, "bossContinueAction")
+		game.GlobalGameShelf.Games[p.GameID].ReceiveMessage(p.PlayerID, "boss.round.continue", msg)
 	})
 
 	server.OnEvent("/", "leaveGameAction", func(s socket.Conn, msg string) {
 		var p model.JoinRequestAction = s.Context().(model.JoinRequestAction)
 		logRequest(p, "leaveGameAction")
-		getGamePlayFromGameID(p.GameID).RecvMessage(p.PlayerID, "leaveGameAction", msg)
+		game.GlobalGameShelf.Games[p.GameID].ReceiveMessage(p.PlayerID, "leaveGameAction", msg)
 	})
 
 	server.OnEvent("/", "notice", func(s socket.Conn, msg string) {
@@ -97,14 +102,14 @@ func InitServerSession() *socket.Server {
 		log.Println("error occurred:", e.Error())
 		var p model.JoinRequestAction = s.Context().(model.JoinRequestAction)
 		logRequest(p, "errorAction")
-		getGamePlayFromGameID(p.GameID).RecvMessage(p.PlayerID, "leaveGameAction", "")
+		game.GlobalGameShelf.Games[p.GameID].ReceiveMessage(p.PlayerID, "leaveGameAction", "")
 	})
 
 	server.OnDisconnect("/", func(s socket.Conn, reason string) {
 		log.Println("connection ", s.ID(), " closed: ", reason)
 		var p model.JoinRequestAction = s.Context().(model.JoinRequestAction)
 		logRequest(p, "disconnectAction")
-		getGamePlayFromGameID(p.GameID).RecvMessage(p.PlayerID, "leaveGameAction", "")
+		game.GlobalGameShelf.Games[p.GameID].ReceiveMessage(p.PlayerID, "leaveGameAction", "")
 	})
 
 	go server.Serve()

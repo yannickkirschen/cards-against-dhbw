@@ -184,11 +184,3 @@ func (g *Game) WhoIsNextBoss() *Player {
 
 	return g.Players[0]
 }
-
-func (this *Game) RecvMessage(playerID string, msgType string, msg string) string {
-	return "success"
-}
-
-func (this *Game) SetResponder(playerID string, responder func(s string, s2 ...interface{})) {
-	return
-}
