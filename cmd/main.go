@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/yannickkirschen/cards-against-dhbw/config"
 	"github.com/yannickkirschen/cards-against-dhbw/db"
+	"github.com/yannickkirschen/cards-against-dhbw/game"
+	"github.com/yannickkirschen/cards-against-dhbw/server"
 )
 
 func main() {
@@ -15,13 +16,12 @@ func main() {
 		panic(err)
 	}
 	db.ReadCards()
-	http.HandleFunc("/v1/hello", getHello)
+	game.GlobalGameShelf = game.NewGameShelf()
+
+	http.HandleFunc("/v1/new", game.NewGameHandler)
+	http.HandleFunc("/v1/join/", game.JoinGameHandler)
+
+	http.Handle("/socket.io/", server.InitServerSession())
 
 	fmt.Println(http.ListenAndServe(fmt.Sprintf(":%d", config.DhbwConfig.Port), nil))
-
-}
-
-func getHello(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "text/plain")
-	io.WriteString(w, "hello, world\n")
 }
