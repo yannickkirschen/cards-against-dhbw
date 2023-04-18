@@ -1,6 +1,8 @@
 package game
 
 import (
+	"log"
+
 	"github.com/yannickkirschen/cards-against-dhbw/model"
 )
 
@@ -25,6 +27,7 @@ func (gp *GamePlay) AddSender(playerId string, sender func(string, ...any)) {
 }
 
 func (gp *GamePlay) ReceiveMessage(playerId string, title string, message any) {
+	log.Println("receiving message from " + playerId + ", content: " + title)
 	switch title {
 	case "game.join":
 		if gp.Game.Status() == model.STATUS_GAME_LOBBY {

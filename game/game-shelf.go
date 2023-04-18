@@ -42,9 +42,8 @@ func (gs *GameShelf) CreateGame(name string) (string, string) {
 func (gs *GameShelf) newGameId() string {
 	gameId := utils.RandString(gs.r, 4)
 	for {
-		_, ok := gs.Games[gameId]
-
-		if !ok {
+		_, err := gs.Games[gameId]
+		if err {
 			gameId = utils.RandString(gs.r, 4)
 		} else {
 			return gameId

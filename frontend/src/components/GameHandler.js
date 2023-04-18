@@ -28,7 +28,7 @@ export default class GameHandler extends Component {
     }
 
     isPlayerBoss() {
-        return this.state.player.filter(e => e.isBoss)[0].id == localStorage.getItem("playerID")
+        return this.state.player.length !== 0 && this.state.player.filter(e => e.isBoss)[0].id === localStorage.getItem("playerID")
     }
 
     loadPlayer(src) {
@@ -49,7 +49,7 @@ export default class GameHandler extends Component {
 
     componentDidMount() {
         console.log("component did Mount called")
-        this.socket = io.connect("http://localhost:8000", { transports: ['websocket', 'polling'] })
+        this.socket = io.connect("http://localhost:3333", { transports: ['websocket', 'polling'] })
         this.socket.on("connect", () => {
             console.log("recv: connect")
             this.socket.emit("joinRequestAction", JSON.stringify({ gameID: localStorage.getItem("gameID"), playerID: localStorage.getItem("playerID") }))
@@ -102,7 +102,7 @@ export default class GameHandler extends Component {
             console.log("recv: boss.chosen state")
             let cards = []
             data.playedCards.forEach((card) => {
-                let nC = new GameCard(data.winnerCard == card.id ? CardColor.GOLDEN : CardColor.WHITE, card.text, card.id)
+                let nC = new GameCard(data.winnerCard === card.id ? CardColor.GOLDEN : CardColor.WHITE, card.text, card.id)
                 cards.push(nC)
             })
             let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
@@ -123,17 +123,18 @@ export default class GameHandler extends Component {
         if (this.state.actionState !== "invalidCode") {
             return (
                 <>
+                    <h3>PlayerID: {localStorage.getItem("playerID")}, GameID: {localStorage.getItem("gameID")}</h3>
                     <div className="gameHandler-playerList">
                         <ListPlayer player={this.state.player} />
                     </div>
-                    {(this.state.actionState == "boss.choosing" || this.state.actionState == "boss.can.continue") && <div className="gameHandler-playedCards">
-                        {(this.state.actionState == "boss.choosing" && this.isPlayerBoss()) ?
+                    {(this.state.actionState === "boss.choosing" || this.state.actionState === "boss.can.continue") && <div className="gameHandler-playedCards">
+                        {(this.state.actionState === "boss.choosing" && this.isPlayerBoss()) ?
                             <ListCards cards={this.state.playedCards} onCardSelect={this.onCardSelection} />
                             :
                             <ListCards cards={this.state.playedCards} />}
                     </div>}
                     <div className="gameHandler-whiteCards">
-                        {this.state.actionState == "playerChoosing" && !this.isPlayerBoss() ?
+                        {this.state.actionState === "playerChoosing" && !this.isPlayerBoss() ?
                             <ListCards cards={this.state.whiteCards} onCardSelect={this.onCardSelection} />
                             :
                             <ListCards cards={this.state.whiteCards} />}
@@ -141,7 +142,7 @@ export default class GameHandler extends Component {
                     <div className="gameHandler-blackCard">
                         <ListCards cards={[this.state.blackCard]} />
                     </div>
-                    {(this.isPlayerBoss() && this.state.actionState == "boss.can.continue") && <Button variant="contained" onClick={() => this.so
+                    {(this.isPlayerBoss() && this.state.actionState === "boss.can.continue") && <Button variant="contained" onClick={() => this.so
                         .emit("game.start", JSON.stringify({}))}>Next Round</Button>}
                 </>
             )
