@@ -31,19 +31,17 @@ func JoinGameHandler(w http.ResponseWriter, r *http.Request) {
 
 func handleNewGameGet(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
-	log.Println("Query parameter name: " + name)
+	log.Println("Query parameter 'name': " + name)
 	if name == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("no name given"))
 		return
 	}
-	log.Println("recognized parameter being valid")
 	gameId, playerId := GlobalGameShelf.CreateGame(name)
 	response := &response{
 		GameId:   gameId,
 		PlayerId: playerId,
 	}
-	log.Println("created game")
 	b, err := json.Marshal(response)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

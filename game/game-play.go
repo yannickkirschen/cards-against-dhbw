@@ -28,9 +28,11 @@ func (gp *GamePlay) AddSender(playerId string, sender func(string, ...any)) {
 
 func (gp *GamePlay) ReceiveMessage(playerId string, title string, message any) {
 	log.Println("receiving message from " + playerId + ", content: " + title)
+	//TODO: now fails to recognize status (I believe)
 	switch title {
 	case "game.join":
 		if gp.Game.Status() == model.STATUS_GAME_LOBBY {
+			log.Println("status game lobby at game.join")
 			gp.handleGameJoin()
 			gp.UpdateState()
 		}
@@ -162,5 +164,5 @@ func (gp *GamePlay) sendLobbyState(title string) {
 }
 
 func (gp *GamePlay) sendInvalidState(playerId string) {
-	gp.Senders[playerId]("invalid", nil)
+	//gp.Senders[playerId]("invalid", nil)
 }

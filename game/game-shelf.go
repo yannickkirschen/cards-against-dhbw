@@ -30,6 +30,8 @@ func (gs *GameShelf) CreateGame(name string) (string, string) {
 			Code: gameId,
 		},
 	}
+	//TODO: check if this makes sense @Yannick Kirschen
+	gamePlay.Senders = make(map[string]func(title string, message ...any))
 	player, _ := gamePlay.Game.GeneratePlayer(name)
 	player.IsMod = true
 	gamePlay.Game.Mod = player

@@ -7,6 +7,7 @@ import ListCards from './ListCards'
 import { Link } from "react-router-dom";
 import { Button } from "@mui/material";
 
+import socket from "./socket";
 
 export default class GameHandler extends Component {
 
@@ -25,6 +26,7 @@ export default class GameHandler extends Component {
             //  none
         }
         this.onCardSelection = this.onCardSelection.bind(this);
+
     }
 
     isPlayerBoss() {
@@ -49,40 +51,37 @@ export default class GameHandler extends Component {
 
     componentDidMount() {
         console.log("component did Mount called")
-        this.socket = io.connect("http://localhost:3333", { transports: ['websocket', 'polling'] })
-        this.socket.on("connect", () => {
-            console.log("recv: connect")
-            this.socket.emit("joinRequestAction", JSON.stringify({ gameID: localStorage.getItem("gameID"), playerID: localStorage.getItem("playerID") }))
+        // socket = io.connect("http://192.168.0.26:3333/", { transports: ['websocket', 'polling'] })
+        if (socket.connected) {
+            socket.emit("join", JSON.stringify({ gameID: localStorage.getItem("gameID"), playerID: localStorage.getItem("playerID") }))
+        }
+        this.didUnMount = () => { socket.disconnect(); console.log("disconnected ") }
 
-        })
-        this.didUnMount = () => { this.socket.disconnect(); console.log("disconnected ") }
-
-        this.socket.on("invalidCodeState", data => {
+        socket.on("invalidCodeState", data => {
             console.log("recv: invalid code state")
-            this.socket.disconnect()
             this.setState({ actionState: "invalidCode" })
             localStorage.removeItem("gameID")
             localStorage.removeItem("playerID")
         })
 
-        this.socket.on("game.joined", data => {
+        socket.on("game.joined", data => {
             console.log("recv: lobby state")
             this.setState({ player: this.loadPlayer(data.players), actionState: "game.joined" })
         })
 
-        this.socket.on("game.finished", data => {
+        socket.on("game.finished", data => {
             console.log("recv: lobby state")
             this.setState({ player: this.loadPlayer(data.players), actionState: "game.finished" })
         })
 
 
-        this.socket.on("player.choosing", data => {
+        socket.on("player.choosing", data => {
             console.log("recv: player.choosing")
             let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
             this.setState({ player: this.loadPlayer(data.players), whiteCards: this.loadWhiteCards(data.whiteCards), blackCard: b, actionState: "player.choosing" })
         })
 
-        this.socket.on("bossWaitingState", data => {
+        socket.on("bossWaitingState", data => {
             console.log("recv: boss waiting state")
             let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
             let w = []
@@ -92,13 +91,13 @@ export default class GameHandler extends Component {
             this.setState({ player: this.loadPlayer(data.players), whiteCards: w, blackCard: b, actionState: "none" })
         })
 
-        this.socket.on("boss.choosing", data => {
+        socket.on("boss.choosing", data => {
             console.log("recv: boss.choosing state")
             let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
             this.setState({ blackCard: b, playedCards: this.loadWhiteCards(data.whiteCards), player: this.loadPlayer(data.players), actionState: "boss.choosing" })
         })
 
-        this.socket.on("boss.chosen", data => {
+        socket.on("boss.chosen", data => {
             console.log("recv: boss.chosen state")
             let cards = []
             data.playedCards.forEach((card) => {
@@ -111,7 +110,7 @@ export default class GameHandler extends Component {
     }
 
     onCardSelection(c) {
-        this.socket.emit("cardChosenAction", JSON.stringify({ card: c.id }))
+        socket.emit("cardChosenAction", JSON.stringify({ card: c.id }))
     }
 
     componentWillUnmount() {
@@ -142,8 +141,7 @@ export default class GameHandler extends Component {
                     <div className="gameHandler-blackCard">
                         <ListCards cards={[this.state.blackCard]} />
                     </div>
-                    {(this.isPlayerBoss() && this.state.actionState === "boss.can.continue") && <Button variant="contained" onClick={() => this.so
-                        .emit("game.start", JSON.stringify({}))}>Next Round</Button>}
+                    {(this.isPlayerBoss() && this.state.actionState === "boss.can.continue") && <Button variant="contained" onClick={() => socket.emit("game.start", JSON.stringify({}))}>Next Round</Button>}
                 </>
             )
         }
