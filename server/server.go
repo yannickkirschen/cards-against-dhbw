@@ -12,7 +12,6 @@ import (
 	"github.com/googollee/go-socket.io/engineio/transport"
 	"github.com/googollee/go-socket.io/engineio/transport/polling"
 	"github.com/googollee/go-socket.io/engineio/transport/websocket"
-	"github.com/yannickkirschen/cards-against-dhbw/db"
 	"github.com/yannickkirschen/cards-against-dhbw/game"
 	"github.com/yannickkirschen/cards-against-dhbw/model"
 )
@@ -54,16 +53,14 @@ func InitServerSession() *socket.Server {
 		json.Unmarshal([]byte(msg), &p)
 		logRequest(p, "game.join")
 		s.SetContext(p)
-		// TODO check if game exists. If not, emit invalidCode stuff
-		game.GlobalGameShelf.Games[p.GameID].AddSender(p.PlayerID, s.Emit)
 
-		game.GlobalGameShelf.Games[p.GameID].ReceiveMessage(p.PlayerID, "game.join", msg)
+		gp, err := game.GlobalGameShelf.GamePlay(p.GameID)
+		if err != nil {
+			return
+		}
 
-		var wcards []*model.Card = db.GlobalWhiteCards[0:4]
-		var pl []*model.PublicPlayer = make([]*model.PublicPlayer, 0)
-		var state model.PlayerChoosingState = model.PlayerChoosingState{BlackCard: db.GlobalBlackCards[0], WhiteCards: wcards, Players: pl}
-		s.Emit("playerChoosingState", state)
-
+		gp.AddSender(p.PlayerID, s.Emit)
+		gp.ReceiveMessage(p.PlayerID, "game.join", msg)
 	})
 
 	server.OnEvent("/", "startGameAction", func(s socket.Conn, msg string) {
