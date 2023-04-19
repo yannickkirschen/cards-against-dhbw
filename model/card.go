@@ -22,3 +22,11 @@ type Card struct {
 	// The type of the card.
 	Type int `json:"type"`
 }
+
+func NewCard(id string, text string, t int) *Card {
+	return &Card{
+		ID:   id,
+		Text: text,
+		Type: t,
+	}
+}

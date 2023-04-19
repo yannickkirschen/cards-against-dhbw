@@ -1,7 +1,7 @@
 // Package db provides a session to manage the database connection.
 //
 // Author: Yannick Kirschen
-package db
+package data
 
 import (
 	"github.com/redis/go-redis/v9"

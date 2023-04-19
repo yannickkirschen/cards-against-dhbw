@@ -54,17 +54,14 @@ func InitServerSession() *socket.Server {
 		logRequest(p, "game.join")
 		s.SetContext(p)
 
-		// TODO check if game exists. If not, emit invalidCode stuff
-		game.GlobalGameShelf.Games[p.GameID].AddSender(p.PlayerID, s.Emit)
-		log.Println("added sender to game")
-		game.GlobalGameShelf.Games[p.GameID].ReceiveMessage(p.PlayerID, "game.join", msg)
-		return "recv joinEvent"
+		gp, err := game.GlobalGameShelf.GamePlay(p.GameID)
+		if err != nil {
+			return "recv err"
+		}
 
-		/*		var wcards []*model.Card = db.GlobalWhiteCards[0:4]
-				var pl []*model.PublicPlayer = make([]*model.PublicPlayer, 0)
-				var state model.PlayerChoosingState = model.PlayerChoosingState{BlackCard: db.GlobalBlackCards[0], WhiteCards: wcards, Players: pl}
-				s.Emit("playerChoosingState", state)
-		*/
+		gp.AddSender(p.PlayerID, s.Emit)
+		gp.ReceiveMessage(p.PlayerID, "game.join", msg)
+		return "recv game.join"
 	})
 
 	server.OnEvent("/", "startGameAction", func(s socket.Conn, msg string) string {
