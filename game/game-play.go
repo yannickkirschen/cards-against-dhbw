@@ -25,6 +25,9 @@ func (gp *GamePlay) AddSender(playerId string, sender func(string, ...any)) {
 }
 
 func (gp *GamePlay) ReceiveMessage(playerId string, title string, message any) {
+	gp.Game.Mutex.Lock()
+	defer gp.Game.Mutex.Unlock()
+
 	switch title {
 	case "game.join":
 		if gp.Game.Status() == model.STATUS_GAME_LOBBY {
