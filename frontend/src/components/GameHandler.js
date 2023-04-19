@@ -7,6 +7,7 @@ import ListCards from './ListCards'
 import { Link } from "react-router-dom";
 import { Button } from "@mui/material";
 
+import socket from "./socket";
 
 export default class GameHandler extends Component {
 
@@ -15,7 +16,7 @@ export default class GameHandler extends Component {
         this.state = {
             player: [],
             whiteCards: [],
-            blackCard: new GameCard(CardColor.BLACK, "", "NONE"),
+            blackCard: null,
             actionState: "invalidCoe",
             // action states are:
             //  invalidCode - link to home enabled
@@ -25,9 +26,12 @@ export default class GameHandler extends Component {
             //  none
         }
         this.onCardSelection = this.onCardSelection.bind(this);
+
     }
 
-
+    isPlayerBoss() {
+        return this.state.player.length !== 0 && this.state.player.filter(e => e.isBoss)[0].id === localStorage.getItem("playerID")
+    }
 
     loadPlayer(src) {
         let p = []
@@ -47,34 +51,37 @@ export default class GameHandler extends Component {
 
     componentDidMount() {
         console.log("component did Mount called")
-        this.socket = io.connect("http://localhost:8000", { transports: ['websocket', 'polling'] })
-        this.socket.on("connect", () => {
-            console.log("recv: connect")
-            this.socket.emit("joinRequestAction", JSON.stringify({ gameID: localStorage.getItem("gameID"), playerID: localStorage.getItem("playerID") }))
+        // socket = io.connect("http://192.168.0.26:3333/", { transports: ['websocket', 'polling'] })
+        if (socket.connected) {
+            socket.emit("join", JSON.stringify({ gameID: localStorage.getItem("gameID"), playerID: localStorage.getItem("playerID") }))
+        }
+        this.didUnMount = () => { socket.disconnect(); console.log("disconnected ") }
 
-        })
-        this.didUnMount = () => { this.socket.disconnect(); console.log("disconnected ") }
-
-        this.socket.on("invalidCodeState", data => {
+        socket.on("invalidCodeState", data => {
             console.log("recv: invalid code state")
-            this.socket.disconnect()
             this.setState({ actionState: "invalidCode" })
             localStorage.removeItem("gameID")
             localStorage.removeItem("playerID")
         })
 
-        this.socket.on("lobbyState", data => {
+        socket.on("game.joined", data => {
+            console.log("recv: lobby state  > " + JSON.stringify(data))
+            this.setState({ player: this.loadPlayer(data.players), actionState: "game.joined" })
+        })
+
+        socket.on("game.finished", data => {
             console.log("recv: lobby state")
-            this.setState({ player: this.loadPlayer(data.players), actionState: "gameWaiting" })
+            this.setState({ player: this.loadPlayer(data.players), actionState: "game.finished" })
         })
 
-        this.socket.on("playerChoosingState", data => {
-            console.log("recv: playerChoosingState state")
+
+        socket.on("player.choosing", data => {
+            console.log("recv: player.choosing")
             let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
-            this.setState({ player: this.loadPlayer(data.players), whiteCards: this.loadWhiteCards(data.whiteCards), blackCard: b, actionState: "playerChoosing" })
+            this.setState({ player: this.loadPlayer(data.players), whiteCards: this.loadWhiteCards(data.whiteCards), blackCard: b, actionState: "player.choosing" })
         })
 
-        this.socket.on("bossWaitingState", data => {
+        socket.on("bossWaitingState", data => {
             console.log("recv: boss waiting state")
             let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
             let w = []
@@ -84,27 +91,26 @@ export default class GameHandler extends Component {
             this.setState({ player: this.loadPlayer(data.players), whiteCards: w, blackCard: b, actionState: "none" })
         })
 
-        this.socket.on("bossChoosingState", data => {
-            console.log("recv: bossChoosingState state")
+        socket.on("boss.choosing", data => {
+            console.log("recv: boss.choosing state")
             let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
-            this.setState({ blackCard: b, whiteCards: this.loadWhiteCards(data.playedCards), player: this.loadPlayer(data.players), actionState: "bossChoosing" })
+            this.setState({ blackCard: b, playedCards: this.loadWhiteCards(data.whiteCards), player: this.loadPlayer(data.players), actionState: "boss.choosing" })
         })
 
-        this.socket.on("bossHasChosenState", data => {
-            console.log("recv: boss has chosen state")
+        socket.on("boss.chosen", data => {
+            console.log("recv: boss.chosen state")
             let cards = []
-            data.playedCards.forEach((owner, card, map) => {
-                let nC = new GameCard(data.winnerCard.text.id == card.id ? CardColor.GOLDEN : CardColor.WHITE, card.text, card.id)
-                nC.setOwner(owner)
+            data.playedCards.forEach((card) => {
+                let nC = new GameCard(data.winnerCard === card.id ? CardColor.GOLDEN : CardColor.WHITE, card.text, card.id)
                 cards.push(nC)
             })
             let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
-            this.setState({ blackCard: b, player: this.loadPlayer(data.players), whiteCards: cards, actionState: "none" })
+            this.setState({ blackCard: b, player: this.loadPlayer(data.players), playedCards: cards, actionState: "boss.can.continue" })
         })
     }
 
     onCardSelection(c) {
-        this.socket.emit("cardChosenAction", JSON.stringify({ card: c.id }))
+        socket.emit("cardChosenAction", JSON.stringify({ card: c.id }))
     }
 
     componentWillUnmount() {
@@ -116,27 +122,32 @@ export default class GameHandler extends Component {
         if (this.state.actionState !== "invalidCode") {
             return (
                 <>
+                    <h3>PlayerID: {localStorage.getItem("playerID")}, GameID: {localStorage.getItem("gameID")}</h3>
                     <div className="gameHandler-playerList">
                         <ListPlayer player={this.state.player} />
                     </div>
+                    {(this.state.actionState === "boss.choosing" || this.state.actionState === "boss.can.continue") && <div className="gameHandler-playedCards">
+                        {(this.state.actionState === "boss.choosing" && this.isPlayerBoss()) ?
+                            <ListCards cards={this.state.playedCards} onCardSelect={this.onCardSelection} />
+                            :
+                            <ListCards cards={this.state.playedCards} />}
+                    </div>}
                     <div className="gameHandler-whiteCards">
-                        {this.state.actionState == "playerChoosing" || this.state.actionState == "bossChoosing" ?
+                        {this.state.actionState === "playerChoosing" && !this.isPlayerBoss() ?
                             <ListCards cards={this.state.whiteCards} onCardSelect={this.onCardSelection} />
                             :
                             <ListCards cards={this.state.whiteCards} />}
-                        {console.log("state: " + JSON.stringify(this.state))}
                     </div>
                     <div className="gameHandler-blackCard">
-                        <ListCards cards={[this.state.blackCard]} />
+                        {this.state.blackCard && <ListCards cards={[this.state.blackCard]} />}
                     </div>
+                    {(this.isPlayerBoss() && this.state.actionState === "boss.can.continue") && <Button variant="contained" onClick={() => socket.emit("game.start", JSON.stringify({}))}>Next Round</Button>}
                 </>
             )
         }
         else {
             return (
                 <>
-                    <Button onClick={() => { this.socket.emit("notice", "msgTOll") }} >Click Me</Button>
-                    <Button onClick={() => { this.socket.emit("joinRequestAction", JSON.stringify({ gameID: "gello", playerID: "jello" })) }} >Click Me</Button>
                     <h2>Connection to game server failed.</h2>
                     <Link to="/">Home</Link>
                 </>

@@ -1,6 +1,8 @@
 package game
 
 import (
+	"log"
+
 	"github.com/yannickkirschen/cards-against-dhbw/model"
 )
 
@@ -41,6 +43,7 @@ func (gp *GamePlay) ReceiveMessage(playerId string, title string, message any) {
 
 	switch title {
 	case "game.join":
+		log.Println("recognized game.join")
 		if gp.Game.Status() == model.STATUS_GAME_LOBBY {
 			gp.handleGameJoin()
 		}
@@ -48,12 +51,10 @@ func (gp *GamePlay) ReceiveMessage(playerId string, title string, message any) {
 		if gp.Game.Status() == model.STATUS_GAME_READY {
 			gp.handleNewRound()
 		}
-	case "player.card.chosen":
+	case "entity.card.chosen":
 		if gp.Game.Status() == model.STATUS_PLAYER_CHOOSING {
 			gp.handlePlayerCardChosenAction(playerId, message)
-		}
-	case "boss.card.chosen":
-		if gp.Game.Status() == model.STATUS_BOSS_CHOOSING {
+		} else if gp.Game.Status() == model.STATUS_BOSS_CHOOSING {
 			gp.handleBossCardChosenAction(playerId, message)
 		}
 	case "boss.round.continue":
@@ -153,12 +154,14 @@ func (gp *GamePlay) sendLobbyState(title string) {
 	state := &model.LobbyState{
 		Players: gp.Game.PublicPlayers,
 	}
-
+	log.Printf("state: %#v/n ", state)
 	for _, sender := range gp.Senders {
+		log.Println("sending lobby state")
 		sender(title, state)
 	}
 }
 
 func (gp *GamePlay) sendInvalidState(playerId string) {
-	gp.Senders[playerId]("invalid", nil)
+	log.Println("sending invalid state")
+	gp.Senders[playerId]("invalid", "")
 }

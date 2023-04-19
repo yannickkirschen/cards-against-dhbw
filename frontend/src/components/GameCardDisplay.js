@@ -3,7 +3,7 @@ import { CardColor } from "./dataStructure";
 
 const GameCardDisplay = ({ card, onCardSelect = null }) => {
     let backColor = card.color;
-    let textColor = card.color == CardColor.BLACK ? "white" : "black"
+    let textColor = card.color === CardColor.BLACK ? "white" : "black"
     if (onCardSelect == null) {
         return (
             <Card color="primary">
