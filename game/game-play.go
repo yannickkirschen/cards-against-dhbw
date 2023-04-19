@@ -57,15 +57,6 @@ func (gp *GamePlay) ReceiveMessage(playerId string, title string, message any) {
 		} else if gp.Game.Status() == model.STATUS_BOSS_CHOOSING {
 			gp.handleBossCardChosenAction(playerId, message)
 		}
-	/*case "player.card.chosen":
-		if gp.Game.Status() == model.STATUS_PLAYER_CHOOSING {
-			gp.handlePlayerCardChosenAction(playerId, message)
-		}
-	case "boss.card.chosen":
-		if gp.Game.Status() == model.STATUS_BOSS_CHOOSING {
-			gp.handleBossCardChosenAction(playerId, message)
-			gp.UpdateState()
-		}*/
 	case "boss.round.continue":
 		if gp.Game.Status() == model.STATUS_ROUND_FINISHED {
 			gp.handleNewRound()
