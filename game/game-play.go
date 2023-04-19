@@ -33,33 +33,32 @@ func (gp *GamePlay) AddSender(playerId string, sender func(string, ...any)) {
 
 func (gp *GamePlay) ReceiveMessage(playerId string, title string, message any) {
 	gp.Game.Mutex.Lock()
+
+	defer gp.UpdateState()
 	defer gp.Game.Mutex.Unlock()
+
+	gp.UpdateState()
 
 	switch title {
 	case "game.join":
 		if gp.Game.Status() == model.STATUS_GAME_LOBBY {
 			gp.handleGameJoin()
-			gp.UpdateState()
 		}
 	case "game.start":
 		if gp.Game.Status() == model.STATUS_GAME_READY {
 			gp.handleNewRound()
-			gp.UpdateState()
 		}
 	case "player.card.chosen":
 		if gp.Game.Status() == model.STATUS_PLAYER_CHOOSING {
 			gp.handlePlayerCardChosenAction(playerId, message)
-			gp.UpdateState()
 		}
 	case "boss.card.chosen":
 		if gp.Game.Status() == model.STATUS_BOSS_CHOOSING {
 			gp.handleBossCardChosenAction(playerId, message)
-			gp.UpdateState()
 		}
 	case "boss.round.continue":
 		if gp.Game.Status() == model.STATUS_ROUND_FINISHED {
 			gp.handleNewRound()
-			gp.Game.UpdatePublicPlayers()
 		}
 	default:
 		gp.sendInvalidState(playerId)
