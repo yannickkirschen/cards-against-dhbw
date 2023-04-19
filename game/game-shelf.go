@@ -31,7 +31,7 @@ func (gs *GameShelf) CreateGame(name string) (string, string) {
 	var whites []*model.Card
 	data.ReadCards(blacks, whites)
 
-	gamePlay := NewGamePlay(model.NewGame(gameId, blacks, whites))
+	gamePlay := NewGamePlay(model.NewGame(gameId))
 	player, _ := gamePlay.Game.GeneratePlayer(name)
 	player.IsMod = true
 	gamePlay.Game.Mod = player

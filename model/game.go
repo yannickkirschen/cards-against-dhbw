@@ -44,13 +44,13 @@ type Game struct {
 	State *State `json:"state"`
 }
 
-func NewGame(code string, blacks []*Card, whites []*Card) *Game {
+func NewGame(code string) *Game {
 	return &Game{
 		Code:          code,
 		Players:       make([]*Player, 0),
 		PublicPlayers: make([]*PublicPlayer, 0),
-		BlackCards:    blacks,
-		WhiteCards:    whites,
+		BlackCards:    make([]*Card, 0),
+		WhiteCards:    make([]*Card, 0),
 		State:         NewState(),
 	}
 }
