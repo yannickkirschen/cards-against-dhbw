@@ -19,6 +19,12 @@ type State struct {
 	Round int `json:"round"`
 }
 
+func NewState() *State {
+	return &State{
+		PlayedCards: make(map[*Player]*Card),
+	}
+}
+
 type PublicPlayer struct {
 	Name   string `json:"name"`
 	IsMod  bool   `json:"isMod"`

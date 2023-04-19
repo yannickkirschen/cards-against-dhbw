@@ -44,6 +44,17 @@ type Game struct {
 	State *State `json:"state"`
 }
 
+func NewGame(code string) *Game {
+	return &Game{
+		Code:          code,
+		Players:       make([]*Player, 0),
+		PublicPlayers: make([]*PublicPlayer, 0),
+		BlackCards:    make([]*Card, 0),
+		WhiteCards:    make([]*Card, 0),
+		State:         NewState(),
+	}
+}
+
 func (g *Game) Status() int {
 	// Status: Game is waiting for players to join.
 	//  - There are less than two players in the game.

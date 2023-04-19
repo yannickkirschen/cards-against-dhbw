@@ -9,6 +9,13 @@ type GamePlay struct {
 	Senders map[string]func(title string, message ...any)
 }
 
+func NewGamePlay(game *model.Game) *GamePlay {
+	return &GamePlay{
+		Game:    game,
+		Senders: make(map[string]func(title string, message ...any)),
+	}
+}
+
 func (gp *GamePlay) UpdateState() {
 	gp.Game.UpdatePublicPlayers()
 

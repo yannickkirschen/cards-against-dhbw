@@ -25,11 +25,7 @@ func NewGameShelf() *GameShelf {
 
 func (gs *GameShelf) CreateGame(name string) (string, string) {
 	gameId := gs.newGameId()
-	gamePlay := &GamePlay{
-		Game: &model.Game{
-			Code: gameId,
-		},
-	}
+	gamePlay := NewGamePlay(model.NewGame(gameId))
 	player, _ := gamePlay.Game.GeneratePlayer(name)
 	player.IsMod = true
 	gamePlay.Game.Mod = player
@@ -42,9 +38,9 @@ func (gs *GameShelf) CreateGame(name string) (string, string) {
 func (gs *GameShelf) newGameId() string {
 	gameId := utils.RandString(gs.r, 4)
 	for {
-		_, ok := gs.Games[gameId]
+		_, exists := gs.Games[gameId]
 
-		if !ok {
+		if exists {
 			gameId = utils.RandString(gs.r, 4)
 		} else {
 			return gameId
