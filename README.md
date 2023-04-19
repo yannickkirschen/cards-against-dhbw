@@ -11,7 +11,7 @@ This project is part of the lecture *Web Engineering 2* and is a clone of the po
 ## Features
 
 - Multiplayer web application for playing the game *Cards against DHBW*.
-- The Master of Desaster (MOD) can create a game and start it. They receive a unique game code that can be shared with other players.
+- The Master of Disaster (MOD) can create a game and start it. They receive a unique game code that can be shared with other players.
 - Players can join a game by entering the game code.
 - Players can choose a unique name.
 - The MOD can start the game after players have joined the lobby.
@@ -43,7 +43,7 @@ If the card is a white card, the blanks are always `-1`. If the card is a black 
 
 ### Persona
 
-- **Master of Desaster (MOD)**: The MOD is the person who creates the game and is responsible for the game flow. They can
+- **Master of Disaster (MOD)**: The MOD is the person who creates the game and is responsible for the game flow. They can
 start the game, add new cards and kick players.
 - **Player**: A player can join a game and play the game. They can also add new cards to the game.
 
