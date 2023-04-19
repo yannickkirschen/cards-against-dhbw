@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/base64"
 	"errors"
+	"sync"
 )
 
 const (
@@ -16,6 +17,9 @@ const (
 
 // The central game structure.
 type Game struct {
+	// The mutex used to synchronize access to the game.
+	Mutex sync.Mutex
+
 	// The unique game code.
 	Code string `json:"code"`
 
