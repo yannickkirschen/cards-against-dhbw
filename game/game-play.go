@@ -39,8 +39,8 @@ func (gp *GamePlay) ReceiveMessage(playerId string, title string, message any) {
 
 	switch title {
 	case "game.join":
+		log.Println("recognized game.join")
 		if gp.Game.Status() == model.STATUS_GAME_LOBBY {
-			log.Println("status game lobby at game.join")
 			gp.handleGameJoin()
 			gp.UpdateState()
 		}
@@ -165,12 +165,14 @@ func (gp *GamePlay) sendLobbyState(title string) {
 	state := &model.LobbyState{
 		Players: gp.Game.PublicPlayers,
 	}
-
+	log.Printf("state: %#v/n ", state)
 	for _, sender := range gp.Senders {
+		log.Println("sending lobby state")
 		sender(title, state)
 	}
 }
 
 func (gp *GamePlay) sendInvalidState(playerId string) {
-	//gp.Senders[playerId]("invalid", nil)
+	log.Println("sending invalid state")
+	gp.Senders[playerId]("invalid", "")
 }

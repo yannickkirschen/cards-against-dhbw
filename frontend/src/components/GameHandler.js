@@ -16,7 +16,7 @@ export default class GameHandler extends Component {
         this.state = {
             player: [],
             whiteCards: [],
-            blackCard: new GameCard(CardColor.BLACK, "", "NONE"),
+            blackCard: null,
             actionState: "invalidCoe",
             // action states are:
             //  invalidCode - link to home enabled
@@ -65,7 +65,7 @@ export default class GameHandler extends Component {
         })
 
         socket.on("game.joined", data => {
-            console.log("recv: lobby state")
+            console.log("recv: lobby state  > " + JSON.stringify(data))
             this.setState({ player: this.loadPlayer(data.players), actionState: "game.joined" })
         })
 
@@ -139,7 +139,7 @@ export default class GameHandler extends Component {
                             <ListCards cards={this.state.whiteCards} />}
                     </div>
                     <div className="gameHandler-blackCard">
-                        <ListCards cards={[this.state.blackCard]} />
+                        {this.state.blackCard && <ListCards cards={[this.state.blackCard]} />}
                     </div>
                     {(this.isPlayerBoss() && this.state.actionState === "boss.can.continue") && <Button variant="contained" onClick={() => socket.emit("game.start", JSON.stringify({}))}>Next Round</Button>}
                 </>
