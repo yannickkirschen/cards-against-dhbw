@@ -3,6 +3,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    min-height: 100%;
+    margin: 0;
 }
 
 .home-join-game {
@@ -29,6 +31,7 @@
 }
 
 .home-create-game button {
+    margin-top: 5px;
     margin-bottom: 10px;
     width: 100%;
 }

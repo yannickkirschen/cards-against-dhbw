@@ -1,0 +1,37 @@
+.App-header {
+    background-color: #282c34;
+    height: 14vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: calc(20px + 2vmin);
+    color: white;
+    z-index: -1;
+}
+
+.homeIcon-button {
+    width: 10%;
+    border-radius: 5px
+}
+
+.homeIcon-button:hover {
+    background-color: lightblue !important;
+    border-radius: 5px;
+}
+
+.header-text {
+    width: 80%;
+    text-align: center;
+}
+
+.App-header-placeholder {
+    width: 10%;
+    border-radius: 5px;
+}
+
+.searchIcon-button:hover {
+    background-color: lightblue !important;
+    border-radius: 5px;
+}
