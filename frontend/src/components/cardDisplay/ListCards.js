@@ -1,4 +1,4 @@
-import { Card, Paper, Stack } from "@mui/material"
+import { Paper, Stack } from "@mui/material"
 import { styled } from '@mui/material/styles';
 import GameCardDisplay from "./GameCardDisplay";
 import GameCardButton from "./GameCardButton";
