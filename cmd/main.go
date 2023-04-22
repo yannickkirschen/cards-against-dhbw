@@ -6,8 +6,9 @@ import (
 	"net/http"
 
 	"github.com/yannickkirschen/cards-against-dhbw/config"
-	"github.com/yannickkirschen/cards-against-dhbw/game"
+	"github.com/yannickkirschen/cards-against-dhbw/endpoint"
 	"github.com/yannickkirschen/cards-against-dhbw/server"
+	"github.com/yannickkirschen/cards-against-dhbw/shelf"
 )
 
 func main() {
@@ -18,10 +19,10 @@ func main() {
 		log.Panicf("Unable to start the server: could not read config file. Error was: %s", err.Error())
 	}
 
-	game.GlobalGameShelf = game.NewGameShelf()
+	shelf.GlobalShelf = shelf.New()
 
-	http.HandleFunc("/v1/new", game.NewGameHandler)
-	http.HandleFunc("/v1/join/", game.JoinGameHandler)
+	http.HandleFunc("/v1/new", endpoint.NewGameHandler)
+	http.HandleFunc("/v1/join/", endpoint.JoinGameHandler)
 
 	http.Handle("/socket.io/", server.InitServerSession())
 

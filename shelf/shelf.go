@@ -1,4 +1,4 @@
-package game
+package shelf
 
 import (
 	"errors"
@@ -7,22 +7,23 @@ import (
 	"time"
 
 	"github.com/yannickkirschen/cards-against-dhbw/data"
-	"github.com/yannickkirschen/cards-against-dhbw/model"
+	"github.com/yannickkirschen/cards-against-dhbw/game"
+	"github.com/yannickkirschen/cards-against-dhbw/play"
 	"github.com/yannickkirschen/cards-against-dhbw/utils"
 )
 
-var GlobalGameShelf *GameShelf
+var GlobalShelf *GameShelf
 
 var ErrNotFound = errors.New("game does not exist")
 
 type GameShelf struct {
-	games map[string]*GamePlay
+	games map[string]*play.Play
 	r     *rand.Rand
 }
 
-func NewGameShelf() *GameShelf {
+func New() *GameShelf {
 	r := rand.New(rand.NewSource(time.Now().UnixMicro()))
-	return &GameShelf{games: make(map[string]*GamePlay), r: r}
+	return &GameShelf{games: make(map[string]*play.Play), r: r}
 }
 
 func (gs *GameShelf) CreateGame(name string) (string, string, error) {
@@ -36,18 +37,15 @@ func (gs *GameShelf) CreateGame(name string) (string, string, error) {
 		return "", "", err
 	}
 
-	gamePlay := NewGamePlay(model.NewGame(gameId, blacks, whites))
-	player, _ := gamePlay.Game.GeneratePlayer(name)
-	player.IsMod = true
+	p := play.New(game.New(gameId, blacks, whites))
+	player, _ := p.Game.CreatePlayer(name)
+	p.Game.Mod = player
 
-	gamePlay.Game.AddPlayer(player)
-	gamePlay.Game.Mod = player
-
-	gs.games[gameId] = gamePlay
-	return gameId, player.ID, nil
+	gs.games[gameId] = p
+	return gameId, player.Name, nil
 }
 
-func (gs *GameShelf) GamePlay(id string) (*GamePlay, error) {
+func (gs *GameShelf) Play(id string) (*play.Play, error) {
 	gp, exists := gs.games[id]
 	if exists {
 		return gp, nil
@@ -61,14 +59,12 @@ func (gs *GameShelf) JoinGame(gameId string, name string) (string, error) {
 
 	game, ok := gs.games[gameId]
 	if ok {
-		player, err := game.Game.GeneratePlayer(name)
+		player, err := game.Game.CreatePlayer(name)
 		if err != nil {
 			return "", err
 		}
 
-		game.Game.AddPlayer(player)
-		game.Game.UpdatePublicPlayers()
-		return player.ID, nil
+		return player.Name, nil
 	}
 
 	return "", ErrNotFound
