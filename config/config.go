@@ -5,6 +5,7 @@ package config
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 )
 
@@ -26,13 +27,20 @@ var DhbwConfig Config
 
 // Reads the dhbw.json file
 func InitConfig() error {
-	file, fileErr := os.ReadFile("dhbw.json")
-	if fileErr != nil {
-		return fileErr
+	log.Print("Attempting to read config file...")
+
+	file, err := os.ReadFile("dhbw.json")
+	if err != nil {
+		log.Printf("Unable to read config file: %s", err.Error())
+		return err
 	}
-	jsonErr := json.Unmarshal(file, &DhbwConfig)
-	if jsonErr != nil {
-		return jsonErr
+
+	err = json.Unmarshal(file, &DhbwConfig)
+	if err != nil {
+		log.Printf("Unable to parse config file: %s", err.Error())
+		return err
 	}
+
+	log.Print("Successfully read config file!")
 	return nil
 }

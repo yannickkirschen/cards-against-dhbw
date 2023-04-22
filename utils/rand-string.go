@@ -1,6 +1,8 @@
 package utils
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
@@ -9,5 +11,6 @@ func RandString(r *rand.Rand, n int) string {
 	for i := range b {
 		b[i] = letterRunes[r.Intn(len(letterRunes))]
 	}
+
 	return string(b)
 }

@@ -18,3 +18,12 @@ type Player struct {
 	// If a player has 10 points. they win the game.
 	Points int `json:"points"`
 }
+
+func NewPlayer(id string, name string, isMod bool) *Player {
+	return &Player{
+		ID:    id,
+		Name:  name,
+		IsMod: isMod,
+		Cards: make([]*Card, 0),
+	}
+}

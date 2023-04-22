@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/yannickkirschen/cards-against-dhbw/config"
@@ -10,9 +11,11 @@ import (
 )
 
 func main() {
+	log.Print("Welcome to Cards Against DHBW! Starting server ...")
+
 	err := config.InitConfig()
 	if err != nil {
-		panic(err)
+		log.Panicf("Unable to start the server: could not read config file. Error was: %s", err.Error())
 	}
 
 	game.GlobalGameShelf = game.NewGameShelf()
@@ -22,5 +25,7 @@ func main() {
 
 	http.Handle("/socket.io/", server.InitServerSession())
 
+	port := config.DhbwConfig.Port
+	log.Printf("Server running on port %d", port)
 	fmt.Println(http.ListenAndServe(fmt.Sprintf(":%d", config.DhbwConfig.Port), nil))
 }

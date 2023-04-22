@@ -5,7 +5,8 @@ const CardColor = {
 }
 
 class Player {
-    constructor(name, isMod, isBoss, points) {
+    constructor(id, name, isMod, isBoss, points) {
+        this.id = id
         this.name = name
         this.isMod = isMod
         this.isBoss = isBoss

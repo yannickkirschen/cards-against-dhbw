@@ -26,6 +26,7 @@ func NewState() *State {
 }
 
 type PublicPlayer struct {
+	ID     string `json:"id"`
 	Name   string `json:"name"`
 	IsMod  bool   `json:"isMod"`
 	IsBoss bool   `json:"isBoss"`
@@ -33,20 +34,11 @@ type PublicPlayer struct {
 }
 
 func (s *State) GetPlayedCards() []*Card {
-	cards := make([]*Card, len(s.PlayedCards))
-	for _, v := range s.PlayedCards {
-		cards = append(cards, v)
+	cards := make([]*Card, 0)
+	for _, playedCard := range s.PlayedCards {
+		cards = append(cards, playedCard)
 	}
 	return cards
-}
-
-func (s *State) AllCardsPlayed() bool {
-	for _, v := range s.PlayedCards {
-		if v == nil {
-			return false
-		}
-	}
-	return true
 }
 
 func (s *State) WhoPlayed(cardId string) *Player {
