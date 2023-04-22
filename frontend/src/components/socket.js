@@ -1,6 +1,5 @@
 import * as io from 'socket.io-client'
+import React from 'react'
 
-const socket = io.connect("http://localhost:3333/", { transports: ['websocket', 'polling'] })
-
-
-export default socket;
+export const socket = io.connect("http://localhost:3333/", { transports: ['websocket', 'polling'] })
+export const SocketContext = React.createContext();
