@@ -28,7 +28,7 @@ const joinGame = async (gameID, gamerName, navigate) => {
             return data.gameId
         })
         .then(gameId => {
-            navigate("/game/" + gameID.Id)
+            navigate("/game/" + gameId)
         })
         .catch(err => {
             console.log("caught error while fetching new game: " + err)

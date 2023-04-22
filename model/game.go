@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/base64"
 	"errors"
+	"log"
 	"sync"
 )
 
@@ -72,14 +73,14 @@ func (g *Game) Status() int {
 	// Status: Players are choosing their white cards; Boss is waiting.
 	//  - The sum of all points is n, while the current round is n+1.
 	//  - Not all players have played a card.
-	if g.State.Round-1 == g.SumOfPoints() && !g.State.AllCardsPlayed() {
+	if g.State.Round-1 == g.SumOfPoints() && !g.AllCardsPlayed() {
 		return STATUS_PLAYER_CHOOSING
 	}
 
 	// Status: Players are waiting for boss to choose the best white card.
 	//  - The sum of all points is n, while the current round is n+1.
 	//  - All players have played a card.
-	if g.State.Round-1 == g.SumOfPoints() && g.State.AllCardsPlayed() {
+	if g.State.Round-1 == g.SumOfPoints() && g.AllCardsPlayed() {
 		return STATUS_BOSS_CHOOSING
 	}
 
@@ -101,6 +102,13 @@ func (g *Game) Status() int {
 	return -1
 }
 
+func (g *Game) AddPlayer(player *Player) {
+	g.Players = append(g.Players, player)
+	g.UpdatePublicPlayers()
+
+	log.Printf("Game %s (Game): added player %s!", g.Code, player.Name)
+}
+
 func (g *Game) SumOfPoints() int {
 	var sum = 0
 	for _, player := range g.Players {
@@ -109,14 +117,12 @@ func (g *Game) SumOfPoints() int {
 	return sum
 }
 
-func (g *Game) FindCard(id string) *Card {
-	for _, card := range g.BlackCards {
-		if card.ID == id {
-			return card
-		}
-	}
+func (g *Game) AllCardsPlayed() bool {
+	return len(g.State.PlayedCards) == len(g.Players)-1
+}
 
-	for _, card := range g.WhiteCards {
+func (g *Game) FindCard(id string, player *Player) *Card {
+	for _, card := range player.Cards {
 		if card.ID == id {
 			return card
 		}
@@ -129,10 +135,9 @@ func (g *Game) GeneratePlayer(name string) (*Player, error) {
 	if g.PlayerNameExists(name) {
 		return nil, errors.New("player exists")
 	}
-	player := &Player{
-		ID:   base64.StdEncoding.EncodeToString([]byte(name)),
-		Name: name,
-	}
+	player := NewPlayer(base64.StdEncoding.EncodeToString([]byte(name)), name, false)
+
+	log.Printf("Game %s (Game): generated player %s!", g.Code, player.Name)
 	return player, nil
 }
 
@@ -149,12 +154,15 @@ func (g *Game) UpdatePublicPlayers() {
 	g.PublicPlayers = nil
 	for _, player := range g.Players {
 		g.PublicPlayers = append(g.PublicPlayers, &PublicPlayer{
+			ID:     player.ID,
 			Name:   player.Name,
 			IsMod:  player.IsMod,
 			IsBoss: (g.State.Boss == player),
 			Points: player.Points,
 		})
 	}
+
+	log.Printf("Game %s (Game): updated public players!", g.Code)
 }
 
 func (g *Game) FindPlayer(id string) *Player {
@@ -190,10 +198,9 @@ func (g *Game) ChooseWhiteCard() *Card {
 }
 
 func (g *Game) WhoIsNextBoss() *Player {
-	highestIndex := len(g.Players) - 1
 	for index, player := range g.Players {
 		if g.State.Boss == player {
-			return g.Players[(index+1)%highestIndex]
+			return g.Players[(index+1)%len(g.Players)]
 		}
 	}
 

@@ -8,21 +8,25 @@ import (
 	"github.com/yannickkirschen/cards-against-dhbw/model"
 )
 
-func ReadCards(blacks []*model.Card, whites []*model.Card) error {
+func ReadCards() ([]*model.Card, []*model.Card, error) {
+	log.Print("Attempting to read cards file...")
+
 	card, err := ioutil.ReadFile("cards.json")
 	if err != nil {
-		log.Println("failed to read json: " + err.Error())
-		return err
+		log.Print("Unable to read cards file: ", err.Error())
+		return nil, nil, err
 	}
 
 	var data []*model.Card
 	err = json.Unmarshal(card, &data)
 
 	if err != nil {
-		log.Fatalln("failed to parse cards: ", err)
-		return nil
+		log.Print("Unable to parse cards file: ", err.Error())
+		return nil, nil, err
 	}
 
+	blacks := make([]*model.Card, 0)
+	whites := make([]*model.Card, 0)
 	for _, s := range data {
 		if s.Type == model.BLACK {
 			blacks = append(blacks, s)
@@ -31,5 +35,6 @@ func ReadCards(blacks []*model.Card, whites []*model.Card) error {
 		}
 	}
 
-	return nil
+	log.Printf("Read %d black cards and %d white cards from cards file.", len(blacks), len(whites))
+	return blacks, whites, nil
 }

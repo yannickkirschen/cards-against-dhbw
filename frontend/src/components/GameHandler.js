@@ -29,14 +29,26 @@ export default class GameHandler extends Component {
 
     }
 
-    isPlayerBoss() {
-        return this.state.player.length !== 0 && this.state.player.filter(e => e.isBoss)[0].id === localStorage.getItem("playerID")
+    isPlayerType(f) {
+        console.log(this.state.player)
+        if (this.state.player.length === 0) {
+            return false
+        }
+
+        let filtered = this.state.player.filter(f)
+        console.log(filtered)
+        if (filtered.length === 0) {
+            return false
+        }
+
+        return filtered[0].id === localStorage.getItem("playerID")
     }
 
     loadPlayer(src) {
         let p = []
+        console.log("loadPlayer called")
         src.forEach(element => {
-            p.push(new Player(element.name, element.isMod, element.isBoss, element.points))
+            p.push(new Player(element.id, element.name, element.isMod, element.isBoss, element.points))
         });
         return p
     }
@@ -66,7 +78,7 @@ export default class GameHandler extends Component {
 
         socket.on("game.joined", data => {
             console.log("recv: lobby state  > " + JSON.stringify(data))
-            this.setState({ player: this.loadPlayer(data.players), actionState: "game.joined" })
+            this.setState({ player: this.loadPlayer(data.players), actionState: data.gameReady ? "game.ready" : "game.joined" })
         })
 
         socket.on("game.finished", data => {
@@ -77,18 +89,9 @@ export default class GameHandler extends Component {
 
         socket.on("player.choosing", data => {
             console.log("recv: player.choosing")
+            console.log(JSON.stringify(data))
             let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
             this.setState({ player: this.loadPlayer(data.players), whiteCards: this.loadWhiteCards(data.whiteCards), blackCard: b, actionState: "player.choosing" })
-        })
-
-        socket.on("bossWaitingState", data => {
-            console.log("recv: boss waiting state")
-            let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
-            let w = []
-            for (let card = 0; card < data.numberPlayedCards; card++) {
-                w.push(new GameCard(CardColor.WHITE, "Hidden Card", "NONE"))
-            }
-            this.setState({ player: this.loadPlayer(data.players), whiteCards: w, blackCard: b, actionState: "none" })
         })
 
         socket.on("boss.choosing", data => {
@@ -105,7 +108,7 @@ export default class GameHandler extends Component {
                 cards.push(nC)
             })
             let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
-            this.setState({ blackCard: b, player: this.loadPlayer(data.players), playedCards: cards, actionState: "boss.can.continue" })
+            this.setState({ blackCard: b, player: this.loadPlayer(data.players), playedCards: cards, actionState: "mod.can.continue" })
         })
     }
 
@@ -120,28 +123,31 @@ export default class GameHandler extends Component {
 
     render() {
         if (this.state.actionState !== "invalidCode") {
+            console.log(this.isPlayerType(e => e.isMod))
             return (
                 <>
-                    <h3>PlayerID: {localStorage.getItem("playerID")}, GameID: {localStorage.getItem("gameID")}</h3>
+                    <h3>PlayerID: {localStorage.getItem("playerID")}, GameID: {localStorage.getItem("gameID")}, Action State: {this.state.actionState}, IsMod: {this.isPlayerType(e => e.isMod) ? "yes" : "no"}, IsBoss: {this.isPlayerType(e => e.isBoss) ? "yes" : "no"}</h3>
                     <div className="gameHandler-playerList">
                         <ListPlayer player={this.state.player} />
                     </div>
                     {(this.state.actionState === "boss.choosing" || this.state.actionState === "boss.can.continue") && <div className="gameHandler-playedCards">
-                        {(this.state.actionState === "boss.choosing" && this.isPlayerBoss()) ?
+                        {(this.state.actionState === "boss.choosing" && this.isPlayerType(e => e.isBoss)) ?
                             <ListCards cards={this.state.playedCards} onCardSelect={this.onCardSelection} />
                             :
                             <ListCards cards={this.state.playedCards} />}
                     </div>}
                     <div className="gameHandler-whiteCards">
-                        {this.state.actionState === "playerChoosing" && !this.isPlayerBoss() ?
+                        {this.state.actionState === "player.choosing" && !this.isPlayerType(e => e.isBoss) ?
                             <ListCards cards={this.state.whiteCards} onCardSelect={this.onCardSelection} />
                             :
                             <ListCards cards={this.state.whiteCards} />}
                     </div>
                     <div className="gameHandler-blackCard">
-                        {this.state.blackCard && <ListCards cards={[this.state.blackCard]} />}
+                        {this.state.blackCard !== null && <ListCards cards={[this.state.blackCard]} />}
                     </div>
-                    {(this.isPlayerBoss() && this.state.actionState === "boss.can.continue") && <Button variant="contained" onClick={() => socket.emit("game.start", JSON.stringify({}))}>Next Round</Button>}
+                    {(this.isPlayerType(e => e.isMod) && this.state.actionState === "game.ready") && <Button variant="contained" onClick={() => socket.emit("game.start", JSON.stringify({}))}>Start game</Button>}
+
+                    {(this.isPlayerType(e => e.isMod) && this.state.actionState === "mod.can.continue") && <Button variant="contained" onClick={() => socket.emit("mod.round.continue", JSON.stringify({}))}>Next Round</Button>}
                 </>
             )
         }

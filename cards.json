@@ -27,12 +27,12 @@
     {
         "id": "c3e2b4c5e5d5b5c5aa5fcaaf5c4ad4a1",
         "text": "Die Suche nach einem freien Parkplatz",
-        "type": 0
+        "type": 1
     },
     {
         "id": "6e12db84c72a6bfedc6e8e7b37a924ef",
         "text": "Der Versuch, eine Antwort auf die Frage 'Was ist Duales Studium?' zu finden",
-        "type": 0
+        "type": 1
     },
     {
         "id": "e277f3709a9ecbeab68e1008df1d34dd",
@@ -42,12 +42,12 @@
     {
         "id": "1f9daa6b8192e50b5c5b2f5cb5f5bc5b",
         "text": "Die Vorlesung, bei der der Prof nur seinen Laptopbildschirm zeigt",
-        "type": 0
+        "type": 1
     },
     {
         "id": "0dd0f4151986ba8d0b37c4733c86a9e5",
         "text": "Das Warten auf eine Antwort vom Studienbüro",
-        "type": 0
+        "type": 1
     },
     {
         "id": "e3a90571d3b3b76fae02c1c25d83f605",
@@ -57,6 +57,61 @@
     {
         "id": "88923655e2f39a77aebcc32a1cc8fca6",
         "text": "Die Vorlesung, bei der man sich wünscht, man hätte Kaffee getrunken",
-        "type": 0
+        "type": 1
+    },
+    {
+        "id": "ca0f1e11c35b06d18765c40af9e9b3e7",
+        "text": "Die einzige Möglichkeit, einen Parkplatz an der DHBW zu finden, ist ...",
+        "type": 1
+    },
+    {
+        "id": "31f648c64d7d0daa1b7ca9a9a38d7a31",
+        "text": "Das Einzige, was schlimmer ist als eine Vorlesung am Freitag, ist ...",
+        "type": 1
+    },
+    {
+        "id": "ed5e5ebd3f3038a6fa9f6b952ec6b80a",
+        "text": "Das Studienbüro hat beschlossen, dass ab sofort ... verboten ist.",
+        "type": 1
+    },
+    {
+        "id": "b1d07b165067a9aa9ecb7a0a23441aeb",
+        "text": "Die einzige Erklärung für die DHBW-Mensa ist ...",
+        "type": 1
+    },
+    {
+        "id": "6b5af3d5f5c5e5c5f5ca5c5b5c6b0f39",
+        "text": "Die besten Partys an der DHBW finden statt ...",
+        "type": 1
+    },
+    {
+        "id": "4ec4a913e96a4c617e99e365d9a9a874",
+        "text": "Was verursacht jedes Mal ein kollektives Aufstöhnen in der Vorlesung?",
+        "type": 1
+    },
+    {
+        "id": "d3f59cf62f70db46e54e38d119c9eefd",
+        "text": "Das Geheimnis des Erfolgs an der DHBW ist ...",
+        "type": 1
+    },
+    {
+        "id": "107b98a729d707714f661536bcfe1ce5",
+        "text": "Was ist der Grund, dass du deinen Stundenplan nie verstehen wirst?",
+        "type": 1
+    },
+    {
+        "id": "e7d4910b73ccad7a05bda294d695c5e5",
+        "text": "Das Schlimmste an der DHBW ist ...",
+        "type": 1
+    },
+    {
+        "id": "a8d6e28e9c9deed39224d206f1ba60d3",
+        "text": "Das neue Fach im Studiengang XYZ ist ...",
+        "type": 1
+    },
+    {
+        "id": "d3ec50c0c46db0906f880a9ce9ab2cf1",
+        "text": "Das Beste an der DHBW ist ...",
+        "type": 1
     }
 ]
