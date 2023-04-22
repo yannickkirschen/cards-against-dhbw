@@ -134,10 +134,10 @@ func (gp *GamePlay) handlePlayerCardChosenAction(playerId string, message any) {
 	player := gp.Game.FindPlayer(playerId)
 
 	if ok && player != nil {
-		card := gp.Game.FindCard(action.Card, player)
-		// TODO: remove card from player's cards
-		// TODO: return played card to player again
+		card := gp.Game.FindCardEverywhere(action.Card, player)
+		player.RemoveCard(card.ID)
 		gp.Game.State.PlayedCards[player] = card
+		gp.sendPlayerChoosingState()
 		log.Printf("Game %s (GamePlay): player %s played card %s!", gp.Game.Code, player.Name, card.Text)
 	}
 }
@@ -152,14 +152,14 @@ func (gp *GamePlay) sendBossChoosingState() {
 	for _, sender := range gp.Senders {
 		sender("boss.choosing", state)
 	}
-	log.Printf("Game %s (GamePlay): sent message of type 'player.choosing' to all players!", gp.Game.Code)
+	log.Printf("Game %s (GamePlay): sent message of type 'boss.choosing' to all players!", gp.Game.Code)
 }
 
 func (gp *GamePlay) handleBossCardChosenAction(playerId string, message any) {
 	action, ok := message.(model.CardChosenAction) // TODO: check if player is boss (or is this done in the socket code?)
 	if ok {
 		winnerPlayer := gp.Game.State.WhoPlayed(action.Card)
-		winnerCard := gp.Game.FindCard(action.Card, winnerPlayer)
+		winnerCard := gp.Game.FindCardEverywhere(action.Card, winnerPlayer)
 		winnerPlayer.Points++
 
 		gp.UpdateState()

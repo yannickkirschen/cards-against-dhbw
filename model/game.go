@@ -121,8 +121,12 @@ func (g *Game) AllCardsPlayed() bool {
 	return len(g.State.PlayedCards) == len(g.Players)-1
 }
 
-func (g *Game) FindCard(id string, player *Player) *Card {
-	for _, card := range player.Cards {
+func (g *Game) FindCardEverywhere(id string, player *Player) *Card {
+	if card := player.FindCard(id); card != nil {
+		return card
+	}
+
+	for _, card := range g.State.PlayedCards {
 		if card.ID == id {
 			return card
 		}

@@ -27,3 +27,22 @@ func NewPlayer(id string, name string, isMod bool) *Player {
 		Cards: make([]*Card, 0),
 	}
 }
+
+func (p *Player) FindCard(id string) *Card {
+	for _, card := range p.Cards {
+		if card.ID == id {
+			return card
+		}
+	}
+
+	return nil
+}
+
+func (p *Player) RemoveCard(cardId string) {
+	for i, card := range p.Cards {
+		if card.ID == cardId {
+			p.Cards = append(p.Cards[:i], p.Cards[i+1:]...)
+			return
+		}
+	}
+}
