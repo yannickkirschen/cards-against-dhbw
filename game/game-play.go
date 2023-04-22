@@ -108,10 +108,10 @@ func (gp *GamePlay) handleNewRound() {
 		}
 	}
 
-	gp.UpdateState()
 	log.Printf("Game %s (GamePlay): all players have ten white cards again!", gp.Game.Code)
 	log.Printf("Game %s (GamePlay): created new round!", gp.Game.Code)
 
+	gp.UpdateState()
 	gp.sendPlayerChoosingState()
 }
 
