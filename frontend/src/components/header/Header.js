@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import HomeIcon from '@mui/icons-material/Home';
 import "./header.css"
 import { IconButton } from "@mui/material";
-import SearchIcon from '@mui/icons-material/Search';
 
 function Header() {
     const navigate = useNavigate()
