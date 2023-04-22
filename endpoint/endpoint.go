@@ -1,4 +1,4 @@
-package game
+package endpoint
 
 import (
 	"encoding/json"
@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/yannickkirschen/cards-against-dhbw/shelf"
 	"github.com/yannickkirschen/cards-against-dhbw/utils"
 )
 
@@ -45,7 +46,7 @@ func handleNewGameGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gameId, playerId, err := GlobalGameShelf.CreateGame(name)
+	gameId, playerId, err := shelf.GlobalShelf.CreateGame(name)
 	if err != nil {
 		log.Printf("Error creating game: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -54,8 +55,8 @@ func handleNewGameGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := &response{
-		GameId:   gameId,
-		PlayerId: playerId,
+		GameId: gameId,
+		Player: playerId,
 	}
 
 	b, err := json.Marshal(response)
@@ -91,16 +92,16 @@ func handleJoinGameGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	playerId, err := GlobalGameShelf.JoinGame(gameId, name)
+	playerId, err := shelf.GlobalShelf.JoinGame(gameId, name)
 	switch err {
-	case ErrNotFound:
+	case shelf.ErrNotFound:
 		log.Printf("Player %s cannot join game %s as it does not exist. Error was: %s", name, gameId, err.Error())
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("Game not found"))
 	case nil:
 		response := &response{
-			GameId:   gameId,
-			PlayerId: playerId,
+			GameId: gameId,
+			Player: playerId,
 		}
 
 		b, err := json.Marshal(response)
@@ -119,6 +120,6 @@ func handleJoinGameGet(w http.ResponseWriter, r *http.Request) {
 }
 
 type response struct {
-	GameId   string `json:"gameId"`
-	PlayerId string `json:"playerId"`
+	GameId string `json:"gameId"`
+	Player string `json:"playerId"`
 }
