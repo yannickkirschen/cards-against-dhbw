@@ -33,6 +33,7 @@ class GameHandler extends Component {
         this.onCardSelection = this.onCardSelection.bind(this);
         this.leaveGame = this.leaveGame.bind(this);
         this.findWinner = this.findWinner.bind(this);
+        this.clearGame = this.clearGame.bind(this);
 
     }
 
@@ -83,7 +84,13 @@ class GameHandler extends Component {
 
     leaveGame() {
         this.context.emit("game.leave", JSON.stringify({}));
+        this.clearGame("game.leave");
         this.props.navigate("/")
+    }
+
+    clearGame(reason) {
+        localStorage.clear();
+        this.setState({ player: [], whiteCards: [], blackCard: null, playedCards: [], actionState: reason !== null ? reason : "" })
     }
 
     componentWillUnmount() {
@@ -109,7 +116,7 @@ class GameHandler extends Component {
             localStorage.removeItem("playerID")
         })
 
-        this.context.on("game.joined", data => {
+        this.context.on("game.lobby", data => {
             this.setState({ player: this.loadPlayer(data.players), actionState: data.gameReady ? "game.ready" : "game.joined" })
         })
 
@@ -140,13 +147,13 @@ class GameHandler extends Component {
 
         this.context.on("game.finished", data => {
             this.setState({ player: this.loadPlayer(data.players), actionState: "game.finished" })
+            localStorage.clear()
         })
 
-    }
+        this.context.on("game.abort", data => {
+            this.clearGame("game.abort")
+        })
 
-    componentWillUnmount() {
-        console.log("component will unmount called")
-        //this.didUnMount()
     }
 
     render() {
@@ -173,6 +180,8 @@ class GameHandler extends Component {
                             <h3>You are the MOD. Continue to the next round!</h3>}
                         {(this.state.actionState === "game.finished") &&
                             <h3>Game finished! {this.findWinner()} has won!</h3>}
+                        {(this.state.actionState === "game.abort") &&
+                            <h3>Game aborted. Return to home.</h3>}
                         {this.state.actionState === "invalidCoe" &&
                             <h3>Oops...something went wrong (or I did it again)</h3>}
 
