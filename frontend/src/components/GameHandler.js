@@ -9,8 +9,9 @@ import { Button } from "@mui/material";
 
 import { SocketContext } from "./socket";
 import "./gameHandler.css"
+import withHistory from "./hocs";
 
-export default class GameHandler extends Component {
+class GameHandler extends Component {
 
     static contextType = SocketContext;
 
@@ -30,6 +31,8 @@ export default class GameHandler extends Component {
             //  none
         }
         this.onCardSelection = this.onCardSelection.bind(this);
+        this.leaveGame = this.leaveGame.bind(this);
+        this.findWinner = this.findWinner.bind(this);
 
     }
 
@@ -62,12 +65,42 @@ export default class GameHandler extends Component {
         return w
     }
 
+    findWinner() {
+        let max = 0;
+        let winnerName = "";
+        this.state.player.forEach(p => {
+            if (p.points > max) {
+                max = p.points;
+                winnerName = p.name
+            }
+        })
+        return winnerName;
+    }
+
+    onCardSelection(c) {
+        this.context.emit("cardChosenAction", JSON.stringify({ card: c.id }))
+    }
+
+    leaveGame() {
+        this.context.emit("game.leave", JSON.stringify({}));
+        this.props.navigate("/")
+    }
+
+    componentWillUnmount() {
+        this.leaveGame();
+    }
+
     componentDidMount() {
-        // socket = io.connect("http://192.168.0.26:3333/", { transports: ['websocket', 'polling'] })
-        // const socket = io.connect("http://localhost:3333/", { transports: ['websocket', 'polling'] })
         if (this.context.connected) {
             this.context.emit("join", JSON.stringify({ gameID: localStorage.getItem("gameID"), playerID: localStorage.getItem("playerID") }))
         }
+        if (!this.context.connected) {
+            // somehow this happens on page reload, but connection is
+            this.context.emit("join", JSON.stringify({ gameID: localStorage.getItem("gameID"), playerID: localStorage.getItem("playerID") }))
+        }
+
+        // socket = io.connect("http://192.168.0.26:3333/", { transports: ['websocket', 'polling'] })
+        // const socket = io.connect("http://localhost:3333/", { transports: ['websocket', 'polling'] })
         //this.didUnMount = () => { this.context.disconnect(); console.log("disconnected ") }
 
         this.context.on("invalidCodeState", data => {
@@ -79,11 +112,6 @@ export default class GameHandler extends Component {
         this.context.on("game.joined", data => {
             this.setState({ player: this.loadPlayer(data.players), actionState: data.gameReady ? "game.ready" : "game.joined" })
         })
-
-        this.context.on("game.finished", data => {
-            this.setState({ player: this.loadPlayer(data.players), actionState: "game.finished" })
-        })
-
 
         this.context.on("player.choosing", data => {
             let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
@@ -108,10 +136,12 @@ export default class GameHandler extends Component {
             let b = new GameCard(CardColor.BLACK, data.blackCard.text, data.blackCard.id)
             this.setState({ blackCard: b, player: this.loadPlayer(data.players), playedCards: cards, actionState: "mod.can.continue" })
         })
-    }
 
-    onCardSelection(c) {
-        this.context.emit("cardChosenAction", JSON.stringify({ card: c.id }))
+
+        this.context.on("game.finished", data => {
+            this.setState({ player: this.loadPlayer(data.players), actionState: "game.finished" })
+        })
+
     }
 
     componentWillUnmount() {
@@ -141,6 +171,8 @@ export default class GameHandler extends Component {
                             <h3>Waiting for the MOD to continue</h3>}
                         {(this.state.actionState === "mod.can.continue" && this.isPlayerType(e => e.isMod)) &&
                             <h3>You are the MOD. Continue to the next round!</h3>}
+                        {(this.state.actionState === "game.finished") &&
+                            <h3>Game finished! {this.findWinner()} has won!</h3>}
                         {this.state.actionState === "invalidCoe" &&
                             <h3>Oops...something went wrong (or I did it again)</h3>}
 
@@ -182,6 +214,7 @@ export default class GameHandler extends Component {
                         <div className="gameHandler-playerList-innerContainer">
                             <ListPlayer player={this.state.player} />
                         </div>
+                        <Button variant='contained' color="error" onClick={this.leaveGame}>Leave Game</Button>
                     </div>
                     <div className="gameHandler-devInfo">
                         PlayerID: {localStorage.getItem("playerID")},
@@ -203,3 +236,5 @@ export default class GameHandler extends Component {
         }
     }
 }
+
+export default withHistory(GameHandler);

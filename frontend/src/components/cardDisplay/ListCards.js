@@ -14,7 +14,6 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 const ListCards = ({ cards, onCardSelect = null }) => {
-    console.log("displaying cards: " + JSON.stringify(cards))
     return (
         <Stack direction="row" flexWrap="wrap" display="flex" justifyContent={"space-evenly"} margin={"auto"}>
             {cards.map(el =>
