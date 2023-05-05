@@ -9,13 +9,13 @@ const newGame = async (gamerName, navigate) => {
             return data.gameId
         })
         .then(gameId => {
-            navigate("/game/" + gameId)
+            navigate("/game")
         })
         .catch(err => {
             console.log("caught error while fetching new game: " + err)
             localStorage.setItem("gameID", "emptyID")
             localStorage.setItem("playerID", "emptyPlayerID")
-            navigate("/game/emptyID")
+            navigate("/game")
         })
 }
 
@@ -28,13 +28,13 @@ const joinGame = async (gameID, gamerName, navigate) => {
             return data.gameId
         })
         .then(gameId => {
-            navigate("/game/" + gameId)
+            navigate("/game")
         })
         .catch(err => {
             console.log("caught error while fetching new game: " + err)
             localStorage.setItem("gameID", "emptyID")
             localStorage.setItem("playerID", "emptyPlayerID")
-            navigate("/game/emptyID")
+            navigate("/game")
         })
 }
 

@@ -37,7 +37,7 @@ func InitServerSession() *socket.Server {
 	server.OnEvent("/", "game.start", onEventGameStart)
 	server.OnEvent("/", "cardChosenAction", onEventCardChosen)
 	server.OnEvent("/", "mod.round.continue", onEventRoundContinue)
-	server.OnEvent("/", "leaveGameAction", onEventLeaveGame)
+	server.OnEvent("/", "game.leave", onEventLeaveGame)
 	server.OnEvent("/", "notice", onEventNotice)
 	server.OnError("/", onError)
 	server.OnDisconnect("/", onDisconnect)

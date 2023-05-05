@@ -12,8 +12,9 @@ function App() {
                 <Header />
                 <div className='app-body'>
                     <Routes>
-                        <Route path="/game/:id" element={<GameHandler />} />
-                        <Route index element={<Home />} />
+                        <Route path="/game" element={<GameHandler />} />
+                        <Route path="/:id?" element={<Home />} />
+
                     </Routes>
                 </div>
             </div>

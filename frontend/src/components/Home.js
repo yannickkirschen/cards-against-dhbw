@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Button, Divider, TextField } from '@mui/material'
 import { useState } from 'react'
 
@@ -10,8 +10,9 @@ import './Home.css'
 const Home = () => {
     const navigate = useNavigate();
 
-    const [gameID, setGameID] = useState("")
+    const [gameID, setGameID] = useState(useParams().id)
     const [joinName, setJoinName] = useState("")
+
     const [newName, setNewName] = useState("")
 
     return (
