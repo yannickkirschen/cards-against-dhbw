@@ -10,11 +10,11 @@ import (
 )
 
 type Play struct {
-	Game    *game.NewGame
+	Game    *game.Game
 	senders map[*player.Player]communication.Sender
 }
 
-func New(game *game.NewGame) *Play {
+func New(game *game.Game) *Play {
 	return &Play{
 		Game:    game,
 		senders: make(map[*player.Player]communication.Sender),
@@ -47,6 +47,7 @@ func (p *Play) Receive(player string, action string, message any) {
 		p.Game.StartNewRound()
 		p.sendPlayersChoosingState()
 	case game.ACTION_GAME_LEAVE:
+		p.handlePlayerLeave(player)
 	case game.ACTION_CARD_CHOSEN:
 		p.handlePlayerChosenAction(player, message)
 	default:
@@ -104,6 +105,7 @@ func (p *Play) handlePlayerChosenAction(playerName string, message any) {
 		winnerPlayer := p.Game.CurrentRound.WhoPlayed(action.Id)
 		winnerPlayer.Points++
 		winnerCard := p.Game.CurrentRound.PlayedCards[winnerPlayer]
+		p.Game.CurrentRound.Winner = p.Game.CurrentRound.WhoPlayed(action.Id)
 
 		log.Printf("Player %s won round %d with card %s!", winnerPlayer.Name, p.Game.CurrentRound.Counter, winnerCard.Text)
 
@@ -139,6 +141,48 @@ func (p *Play) sendLobbyState(stateName string, gameReady bool) {
 	}
 
 	log.Printf("Sent lobby state to all players for game %s (state was '%s')!", p.Game.Code, stateName)
+}
+
+func (p *Play) handlePlayerLeave(playerName string) {
+	player := p.Game.FindPlayer(playerName)
+	if player == nil {
+		return
+	}
+
+	p.Game.RemovePlayer(player)
+
+	if len(p.Game.Players) < 2 {
+		p.Game.State = game.STATE_GAME_LOBBY
+		p.Game.CurrentRound = nil
+		p.sendLobbyState(game.STATE_GAME_LOBBY, false)
+		return
+	}
+
+	if p.Game.Mod == player {
+		p.Game.Mod = p.Game.Players[0]
+	}
+
+	if p.Game.CurrentRound.Boss == player {
+		p.Game.StartNewRound()
+		p.sendPlayersChoosingState()
+	} else {
+		p.Game.CurrentRound.RemoveAllForPlayer(player)
+
+		switch p.Game.State {
+		case game.STATE_GAME_LOBBY:
+			p.sendLobbyState(game.STATE_GAME_LOBBY, false)
+		case game.STATE_PLAYERS_CHOOSING:
+			p.sendPlayersChoosingState()
+		case game.STATE_BOSS_CHOOSING:
+			p.sendBossChoosingState()
+		case game.STATE_ROUND_FINISHED:
+			p.sendBossHasChosenState(p.Game.CurrentRound.Winner, p.Game.CurrentRound.PlayedCards[p.Game.CurrentRound.Winner])
+		case game.STATE_GAME_FINISHED:
+			p.sendLobbyState(game.STATE_GAME_FINISHED, true)
+		default:
+			p.sendInvalidState(playerName)
+		}
+	}
 }
 
 func (p *Play) sendInvalidState(player string) {
