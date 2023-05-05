@@ -162,6 +162,8 @@ func (p *Play) handlePlayerLeave(playerName string) {
 		p.Game.Mod = p.Game.Players[0]
 	}
 
+	p.Game.UpdateState()
+
 	if p.Game.CurrentRound.Boss == player {
 		p.Game.StartNewRound()
 		p.sendPlayersChoosingState()
@@ -176,7 +178,7 @@ func (p *Play) sendCurrentState(playerName string) {
 
 	switch p.Game.State {
 	case game.STATE_GAME_LOBBY:
-		p.sendLobbyState(game.STATE_GAME_LOBBY, p.Game.State == game.STATE_GAME_READY)
+		p.sendLobbyState(game.STATE_GAME_LOBBY, false)
 	case game.STATE_GAME_READY:
 		p.sendLobbyState(game.STATE_GAME_READY, true)
 	case game.STATE_PLAYERS_CHOOSING:
