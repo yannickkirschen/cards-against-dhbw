@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button, Divider, TextField } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { newGame, joinGame } from './functions'
 
@@ -9,11 +9,16 @@ import './Home.css'
 
 const Home = () => {
     const navigate = useNavigate();
-
-    const [gameID, setGameID] = useState(useParams().id)
+    const urlID = useParams().id;
+    const [gameID, setGameID] = useState("")
     const [joinName, setJoinName] = useState("")
 
     const [newName, setNewName] = useState("")
+
+    useEffect(() => {
+        console.log("urlID: " + urlID);
+        setGameID(urlID !== undefined ? urlID : "")
+    })
 
     return (
         <div className='home'>
