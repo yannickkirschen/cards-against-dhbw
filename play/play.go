@@ -172,9 +172,13 @@ func (p *Play) handlePlayerLeave(playerName string) {
 }
 
 func (p *Play) sendCurrentState(playerName string) {
+	log.Printf("Sending current state %s for game %s!", p.Game.State, p.Game.Code)
+
 	switch p.Game.State {
 	case game.STATE_GAME_LOBBY:
 		p.sendLobbyState(game.STATE_GAME_LOBBY, p.Game.State == game.STATE_GAME_READY)
+	case game.STATE_GAME_READY:
+		p.sendLobbyState(game.STATE_GAME_READY, true)
 	case game.STATE_PLAYERS_CHOOSING:
 		p.sendPlayersChoosingState()
 	case game.STATE_BOSS_CHOOSING:

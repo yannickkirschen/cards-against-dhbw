@@ -175,15 +175,20 @@ func (g *Game) PlayerNameExists(name string) bool {
 
 // Generates a list of public players for this game.
 func (g *Game) GeneratePublicPlayers() []*player.PublicPlayer {
+	var boss *player.Player = nil
+	if g.CurrentRound != nil {
+		boss = g.CurrentRound.Boss
+	}
+
 	var publicPlayers = make([]*player.PublicPlayer, len(g.Players))
 	for i, player := range g.Players {
-		publicPlayers[i] = player.ToPublic(g.Mod, g.CurrentRound.Boss)
+		publicPlayers[i] = player.ToPublic(g.Mod, boss)
 	}
 
 	return publicPlayers
 }
 
-// Startes a new round.
+// Starts a new round.
 func (g *Game) StartNewRound() {
 	log.Printf("Starting new round in game %s.", g.Code)
 
