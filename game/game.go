@@ -11,13 +11,14 @@ import (
 )
 
 const (
-	ACTION_GAME_JOIN      = "game.join"          // Player wants to join the game
-	ACTION_GAME_START     = "game.start"         // MOD wants to start the game
-	ACTION_GAME_LEAVE     = "game.leave"         // Player wants to leave the game
-	ACTION_CARD_CHOSEN    = "entity.card.chosen" // Player has chosen a card (black or white)
-	ACTION_ROUND_CONTINUE = "mod.round.continue" // MOD wants to continue the round
-	ACTION_FORBIDDEN      = "forbidden"          // Action is forbidden in the current state
-	ACTION_INVALID        = "invalid"            // Invalid action
+	ACTION_GAME_JOIN       = "game.join"          // Player wants to join the game
+	ACTION_GAME_START      = "game.start"         // MOD wants to start the game
+	ACTION_GAME_LEAVE      = "game.leave"         // Player wants to leave the game
+	ACTION_CARD_CHOSEN     = "entity.card.chosen" // Player has chosen a card (black or white)
+	ACTION_ROUND_CONTINUE  = "mod.round.continue" // MOD wants to continue the round
+	ACTION_PLAYER_INACTIVE = "player.inactive"    // Player is inactive
+	ACTION_FORBIDDEN       = "forbidden"          // Action is forbidden in the current state
+	ACTION_INVALID         = "invalid"            // Invalid action
 
 	STATE_GAME_LOBBY       = "game.lobby"      // Players are waiting in the lobby
 	STATE_GAME_READY       = "game.ready"      // Game is ready to be started
@@ -41,7 +42,7 @@ type Game struct {
 	State string `json:"current"`
 
 	// The player who is currently Master of Disaster.
-	Mod *player.Player `json:"mod"`
+	Mod string `json:"mod"`
 
 	// The players in the game.
 	Players []*player.Player `json:"players"`
@@ -147,7 +148,7 @@ func (g *Game) CreatePlayer(name string) (*player.Player, error) {
 
 	p := player.New(name)
 	g.Players = append(g.Players, p)
-	g.CurrentRound.WhiteCards[p] = make([]*card.Card, 0)
+	g.CurrentRound.WhiteCards[p.Name] = make([]*card.Card, 0)
 
 	return p, nil
 }
@@ -175,7 +176,7 @@ func (g *Game) PlayerNameExists(name string) bool {
 
 // Generates a list of public players for this game.
 func (g *Game) GeneratePublicPlayers() []*player.PublicPlayer {
-	var boss *player.Player = nil
+	var boss string = ""
 	if g.CurrentRound != nil {
 		boss = g.CurrentRound.Boss
 	}
@@ -194,7 +195,7 @@ func (g *Game) StartNewRound() {
 
 	round := round.New()
 	round.Counter = g.CurrentRound.Counter + 1
-	round.PlayedCards = make(map[*player.Player]*card.Card)
+	round.PlayedCards = make(map[string]*card.Card)
 	round.Boss = g.whoIsNextBoss()
 	round.BlackCard = g.chooseNextBlackCard()
 
@@ -205,14 +206,14 @@ func (g *Game) StartNewRound() {
 	log.Printf("New round in game %s is %d.", g.Code, round.Counter)
 }
 
-func (g *Game) whoIsNextBoss() *player.Player {
+func (g *Game) whoIsNextBoss() string {
 	for index, player := range g.Players {
-		if g.CurrentRound.Boss == player {
-			return g.Players[(index+1)%len(g.Players)]
+		if g.CurrentRound.Boss == player.Name {
+			return g.Players[(index+1)%len(g.Players)].Name
 		}
 	}
 
-	return g.Players[0]
+	return g.Players[0].Name
 }
 
 func (g *Game) fillUpWhiteCards() {

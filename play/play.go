@@ -5,6 +5,7 @@ import (
 
 	"github.com/yannickkirschen/cards-against-dhbw/card"
 	"github.com/yannickkirschen/cards-against-dhbw/communication"
+	"github.com/yannickkirschen/cards-against-dhbw/data"
 	"github.com/yannickkirschen/cards-against-dhbw/game"
 	"github.com/yannickkirschen/cards-against-dhbw/player"
 )
@@ -30,6 +31,7 @@ func (p *Play) Receive(player string, action string, message any) {
 	p.Game.UpdateState()
 
 	defer p.Game.UpdateState()
+	defer data.Update(p.Game)
 	defer p.Game.Mutex.Unlock()
 
 	log.Printf("Received message from player %s of type %s for game %s!", player, action, p.Game.Code)
@@ -40,6 +42,7 @@ func (p *Play) Receive(player string, action string, message any) {
 
 	switch action {
 	case game.ACTION_GAME_JOIN:
+		p.Game.FindPlayer(player).Active = true
 		p.sendCurrentState(player)
 	case game.ACTION_GAME_START:
 		fallthrough
@@ -50,6 +53,9 @@ func (p *Play) Receive(player string, action string, message any) {
 		p.handlePlayerLeave(player)
 	case game.ACTION_CARD_CHOSEN:
 		p.handlePlayerChosenAction(player, message)
+	case game.ACTION_PLAYER_INACTIVE:
+		p.Game.FindPlayer(player).Active = false
+		p.sendCurrentState(player)
 	default:
 		p.sendInvalidState(player)
 	}
@@ -63,17 +69,37 @@ func (p *Play) Receive(player string, action string, message any) {
 }
 
 func (p *Play) sendPlayersChoosingState() {
+	log.Printf("There are %d senders", len(p.senders))
+	for key := range p.senders {
+		log.Printf("Sender: %s (active: %t)", key.Name, key.Active)
+	}
+
+	log.Printf("There are %d users", len(p.Game.Players))
 	for _, player := range p.Game.Players {
+		log.Printf("User: %s (active: %t)", player.Name, player.Active)
+	}
+
+	/*for _, player := range p.Game.Players {
 		state := &communication.PlayerChoosingState{
 			Players:    p.Game.GeneratePublicPlayers(),
 			BlackCard:  p.Game.CurrentRound.BlackCard,
-			WhiteCards: p.Game.CurrentRound.WhiteCards[player],
+			WhiteCards: p.Game.CurrentRound.WhiteCards[player.Name],
 		}
 
 		p.senders[player].Send(game.STATE_PLAYERS_CHOOSING, state)
+	}*/
+	for player, sender := range p.senders {
+		state := &communication.PlayerChoosingState{
+			Players:    p.Game.GeneratePublicPlayers(),
+			BlackCard:  p.Game.CurrentRound.BlackCard,
+			WhiteCards: p.Game.CurrentRound.WhiteCards[player.Name],
+		}
+
+		sender.Send(game.STATE_PLAYERS_CHOOSING, state)
+		log.Printf("Sent state '%s' to player %s for game %s!", game.STATE_PLAYERS_CHOOSING, player.Name, p.Game.Code)
 	}
 
-	log.Printf("Sent state '%s' to all players for game %s!", game.STATE_PLAYERS_CHOOSING, p.Game.Code)
+	//log.Printf("Sent state '%s' to all players for game %s!", game.STATE_PLAYERS_CHOOSING, p.Game.Code)
 }
 
 func (p *Play) sendBossChoosingState() {
@@ -98,27 +124,27 @@ func (p *Play) handlePlayerChosenAction(playerName string, message any) {
 
 	if p.Game.State == game.STATE_PLAYERS_CHOOSING {
 		card := p.Game.CurrentRound.FindCardFor(player, action.Id)
-		p.Game.CurrentRound.PlayedCards[player] = card
+		p.Game.CurrentRound.PlayedCards[player.Name] = card
 		p.Game.CurrentRound.RemoveCardFor(player, card)
 		p.sendPlayersChoosingState()
 	} else if p.Game.State == game.STATE_BOSS_CHOOSING {
-		winnerPlayer := p.Game.CurrentRound.WhoPlayed(action.Id)
+		winnerPlayer := p.Game.FindPlayer(p.Game.CurrentRound.WhoPlayed(action.Id))
 		winnerPlayer.Points++
-		winnerCard := p.Game.CurrentRound.PlayedCards[winnerPlayer]
-		p.Game.CurrentRound.Winner = p.Game.CurrentRound.WhoPlayed(action.Id)
+		winnerCard := p.Game.CurrentRound.PlayedCards[winnerPlayer.Name]
+		p.Game.CurrentRound.Winner = winnerPlayer.Name
 
 		log.Printf("Player %s won round %d with card %s!", winnerPlayer.Name, p.Game.CurrentRound.Counter, winnerCard.Text)
 
 		p.Game.UpdateState()
-		p.sendBossHasChosenState(winnerPlayer, winnerCard)
+		p.sendBossHasChosenState(winnerPlayer.Name, winnerCard)
 	}
 }
 
-func (p *Play) sendBossHasChosenState(winner *player.Player, winnerCard *card.Card) {
+func (p *Play) sendBossHasChosenState(winner string, winnerCard *card.Card) {
 	state := &communication.BossHasChosenState{
 		Players:     p.Game.GeneratePublicPlayers(),
 		BlackCard:   p.Game.CurrentRound.BlackCard,
-		Winner:      winner.Name,
+		Winner:      winner,
 		WinnerCard:  winnerCard.Text,
 		PlayedCards: p.Game.CurrentRound.FlatPlayedCards(),
 	}
@@ -158,13 +184,13 @@ func (p *Play) handlePlayerLeave(playerName string) {
 		return
 	}
 
-	if p.Game.Mod == player {
-		p.Game.Mod = p.Game.Players[0]
+	if p.Game.Mod == player.Name {
+		p.Game.Mod = p.Game.Players[0].Name
 	}
 
 	p.Game.UpdateState()
 
-	if p.Game.CurrentRound.Boss == player {
+	if p.Game.CurrentRound.Boss == player.Name {
 		p.Game.StartNewRound()
 		p.sendPlayersChoosingState()
 	} else {

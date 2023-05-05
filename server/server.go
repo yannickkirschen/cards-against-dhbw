@@ -51,7 +51,7 @@ func onConnect(s socket.Conn) error {
 	var p communication.JoinRequestAction = communication.JoinRequestAction{GameID: "unregistered", PlayerID: "unregistered"}
 	s.SetContext(p)
 
-	log.Printf("Game %s (socket): player %s connected!", p.GameID, p.PlayerID)
+	log.Printf("Socket connection created.")
 	return nil
 }
 
@@ -145,9 +145,9 @@ func onKickEvent(s socket.Conn, msg string) string {
 		log.Printf("Game %s (socket): game not found, player %s cannot kick another player!", p.GameID, p.PlayerID)
 		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot kick another player!", p.GameID, p.PlayerID)
 	}
+
 	gp.Receive(p.PlayerID, "player.kick", msg)
 	return fmt.Sprintf("Player %s kicked another!", p.PlayerID)
-
 }
 
 func onEventNotice(s socket.Conn, msg string) {
@@ -177,5 +177,5 @@ func onDisconnect(s socket.Conn, reason string) {
 		return
 	}
 
-	gp.Receive(p.PlayerID, "game.leave", "")
+	gp.Receive(p.PlayerID, "player.inactive", "")
 }
