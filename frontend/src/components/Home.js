@@ -18,7 +18,7 @@ const Home = () => {
     useEffect(() => {
         console.log("urlID: " + urlID);
         setGameID(urlID !== undefined ? urlID : "")
-    })
+    }, [])
 
     return (
         <div className='home'>
