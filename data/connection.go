@@ -8,15 +8,11 @@ import (
 	"github.com/yannickkirschen/cards-against-dhbw/config"
 )
 
-// Holds a connection to the redis database.
-// Make sure to call `Create()` before using this variable.
-var Client *redis.Client
-
 // Creates a new connection to the redis database.
-func Create() {
+func NewClient() *redis.Client {
 	conf := config.DhbwConfig.Database
 
-	Client = redis.NewClient(&redis.Options{
+	return redis.NewClient(&redis.Options{
 		Addr:     conf.Address,
 		Password: conf.Password,
 		DB:       conf.DB,
@@ -24,6 +20,6 @@ func Create() {
 }
 
 // Closes the connection to the redis database.
-func Close() error {
-	return Client.Close()
+func Close(client *redis.Client) error {
+	return client.Close()
 }

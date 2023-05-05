@@ -13,7 +13,6 @@ import (
 )
 
 var GlobalShelf *GameShelf
-
 var ErrNotFound = errors.New("game does not exist")
 
 type GameShelf struct {
@@ -23,7 +22,10 @@ type GameShelf struct {
 
 func New() *GameShelf {
 	r := rand.New(rand.NewSource(time.Now().UnixMicro()))
-	return &GameShelf{games: make(map[string]*play.Play), r: r}
+	return &GameShelf{
+		games: make(map[string]*play.Play),
+		r:     r,
+	}
 }
 
 func (gs *GameShelf) CreateGame(name string) (string, string, error) {
@@ -39,35 +41,53 @@ func (gs *GameShelf) CreateGame(name string) (string, string, error) {
 
 	p := play.New(game.New(gameId, blacks, whites))
 	player, _ := p.Game.CreatePlayer(name)
-	p.Game.Mod = player
+	p.Game.Mod = player.Name
 
 	gs.games[gameId] = p
-	return gameId, player.Name, nil
+
+	return gameId, player.Name, data.Update(p.Game)
 }
 
 func (gs *GameShelf) Play(id string) (*play.Play, error) {
 	gp, exists := gs.games[id]
 	if exists {
 		return gp, nil
-	}
+	} else {
+		game, err := data.FindGame(id)
+		if err != nil {
+			return nil, ErrNotFound
+		}
 
-	return nil, ErrNotFound
+		gs.games[id] = play.New(game)
+		return gs.games[id], nil
+	}
 }
 
 func (gs *GameShelf) JoinGame(gameId string, name string) (string, error) {
 	log.Printf("Player %s wants to join game %s!", name, gameId)
 
-	game, ok := gs.games[gameId]
+	gamePlay, ok := gs.games[gameId]
 	if ok {
-		player, err := game.Game.CreatePlayer(name)
+		player, err := gamePlay.Game.CreatePlayer(name)
 		if err != nil {
 			return "", err
 		}
 
 		return player.Name, nil
-	}
+	} else {
+		game, err := data.FindGame(gameId)
+		if err != nil {
+			return "", ErrNotFound
+		}
 
-	return "", ErrNotFound
+		gs.games[gameId] = play.New(game)
+
+		if game.FindPlayer(name) == nil {
+			return gs.JoinGame(gameId, name)
+		} else {
+			return name, nil
+		}
+	}
 }
 
 func (gs *GameShelf) newGameId() string {
