@@ -21,6 +21,9 @@ type Round struct {
 	// must choose a white card.
 	PlayedCards map[*player.Player]*card.Card `json:"playedCards"`
 
+	// If the round is over, this field contains the winner of the round.
+	Winner *player.Player `json:"winner"`
+
 	// The number of the current round. If the sum of all given points is less
 	// than the round counter, a white card is being chosen by the Boss.
 	Counter int `json:"counter"`
@@ -31,6 +34,11 @@ func New() *Round {
 		WhiteCards:  make(map[*player.Player][]*card.Card),
 		PlayedCards: make(map[*player.Player]*card.Card),
 	}
+}
+
+func (r *Round) RemoveAllForPlayer(player *player.Player) {
+	delete(r.WhiteCards, player)
+	delete(r.PlayedCards, player)
 }
 
 // Find the card with the given ID in the white cards of the given player.

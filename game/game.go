@@ -30,7 +30,7 @@ const (
 	MAX_POINTS = 10
 )
 
-type NewGame struct {
+type Game struct {
 	// The mutex used to synchronize access to the game.
 	Mutex sync.Mutex
 
@@ -61,8 +61,8 @@ type NewGame struct {
 // Creates a new game with the given code.
 // Players, black cards and white cards are initialized as empty slices.
 // The state is set to STATE_GAME_LOBBY.
-func New(code string, blacks []*card.Card, whites []*card.Card) *NewGame {
-	return &NewGame{
+func New(code string, blacks []*card.Card, whites []*card.Card) *Game {
+	return &Game{
 		Code:         code,
 		State:        STATE_GAME_LOBBY,
 		Players:      make([]*player.Player, 0),
@@ -74,7 +74,7 @@ func New(code string, blacks []*card.Card, whites []*card.Card) *NewGame {
 
 // Updates the state of this game.
 // After calling this method, `Game.State` will be set to the new state.
-func (g *NewGame) UpdateState() {
+func (g *Game) UpdateState() {
 	log.Printf("Updating state of game %s (old state was '%s').", g.Code, g.State)
 
 	if g.CurrentRound == nil || (g.CurrentRound.Counter == 0 && len(g.Players) < 2) {
@@ -96,7 +96,7 @@ func (g *NewGame) UpdateState() {
 	log.Printf("New state of game %s is '%s'.", g.Code, g.State)
 }
 
-func (g *NewGame) StateAllows(action string) bool {
+func (g *Game) StateAllows(action string) bool {
 	switch action {
 	case ACTION_GAME_JOIN:
 		return g.State == STATE_GAME_LOBBY || g.State == STATE_GAME_READY
@@ -115,7 +115,7 @@ func (g *NewGame) StateAllows(action string) bool {
 
 // Returns the sum of all points of all players in this game.
 // The sum is always less than or equal to the current round counter.
-func (g *NewGame) SumOfPoints() int {
+func (g *Game) SumOfPoints() int {
 	var sum = 0
 	for _, player := range g.Players {
 		sum += player.Points
@@ -125,12 +125,12 @@ func (g *NewGame) SumOfPoints() int {
 
 // This handy function checks, if all players (except the boss) have played a card
 // in the current round. If so, it returns true. Otherwise, it returns false.
-func (g *NewGame) AllCardsPlayed() bool {
+func (g *Game) AllCardsPlayed() bool {
 	return len(g.CurrentRound.PlayedCards) == len(g.Players)-1
 }
 
 // Checks, if one of the players reached the maximum amount of points.
-func (g *NewGame) WeHaveAWinner() bool {
+func (g *Game) WeHaveAWinner() bool {
 	for _, player := range g.Players {
 		if player.Points == MAX_POINTS {
 			return true
@@ -140,7 +140,7 @@ func (g *NewGame) WeHaveAWinner() bool {
 	return false
 }
 
-func (g *NewGame) CreatePlayer(name string) (*player.Player, error) {
+func (g *Game) CreatePlayer(name string) (*player.Player, error) {
 	if g.PlayerNameExists(name) {
 		return nil, errors.New("player exists")
 	}
@@ -152,7 +152,19 @@ func (g *NewGame) CreatePlayer(name string) (*player.Player, error) {
 	return p, nil
 }
 
-func (g *NewGame) PlayerNameExists(name string) bool {
+func (g *Game) RemovePlayer(player *player.Player) {
+	var index = -1
+	for i, p := range g.Players {
+		if p == player {
+			index = i
+			break
+		}
+	}
+
+	g.Players = append(g.Players[:index], g.Players[index+1:]...)
+}
+
+func (g *Game) PlayerNameExists(name string) bool {
 	for _, player := range g.Players {
 		if player.Name == name {
 			return true
@@ -162,7 +174,7 @@ func (g *NewGame) PlayerNameExists(name string) bool {
 }
 
 // Generates a list of public players for this game.
-func (g *NewGame) GeneratePublicPlayers() []*player.PublicPlayer {
+func (g *Game) GeneratePublicPlayers() []*player.PublicPlayer {
 	var publicPlayers = make([]*player.PublicPlayer, len(g.Players))
 	for i, player := range g.Players {
 		publicPlayers[i] = player.ToPublic(g.Mod, g.CurrentRound.Boss)
@@ -172,7 +184,7 @@ func (g *NewGame) GeneratePublicPlayers() []*player.PublicPlayer {
 }
 
 // Startes a new round.
-func (g *NewGame) StartNewRound() {
+func (g *Game) StartNewRound() {
 	log.Printf("Starting new round in game %s.", g.Code)
 
 	round := round.New()
@@ -188,7 +200,7 @@ func (g *NewGame) StartNewRound() {
 	log.Printf("New round in game %s is %d.", g.Code, round.Counter)
 }
 
-func (g *NewGame) whoIsNextBoss() *player.Player {
+func (g *Game) whoIsNextBoss() *player.Player {
 	for index, player := range g.Players {
 		if g.CurrentRound.Boss == player {
 			return g.Players[(index+1)%len(g.Players)]
@@ -198,7 +210,7 @@ func (g *NewGame) whoIsNextBoss() *player.Player {
 	return g.Players[0]
 }
 
-func (g *NewGame) fillUpWhiteCards() {
+func (g *Game) fillUpWhiteCards() {
 	for player, cards := range g.CurrentRound.WhiteCards {
 		new := cards[:]
 		for len(new) < 10 {
@@ -209,7 +221,7 @@ func (g *NewGame) fillUpWhiteCards() {
 	}
 }
 
-func (g *NewGame) chooseNextBlackCard() *card.Card {
+func (g *Game) chooseNextBlackCard() *card.Card {
 	if len(g.BlackCards) == 0 {
 		panic("No black cards left in deck.")
 	}
@@ -222,7 +234,7 @@ func (g *NewGame) chooseNextBlackCard() *card.Card {
 	return card
 }
 
-func (g *NewGame) chooseNextWhiteCard() *card.Card {
+func (g *Game) chooseNextWhiteCard() *card.Card {
 	if len(g.WhiteCards) == 0 {
 		panic("No white cards left in deck.")
 	}
@@ -236,7 +248,7 @@ func (g *NewGame) chooseNextWhiteCard() *card.Card {
 }
 
 // Returns the player with the given name or nil, if no player with this name exists.
-func (g *NewGame) FindPlayer(name string) *player.Player {
+func (g *Game) FindPlayer(name string) *player.Player {
 	for _, player := range g.Players {
 		if player.Name == name {
 			return player
