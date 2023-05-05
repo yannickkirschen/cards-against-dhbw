@@ -40,6 +40,7 @@ func (gs *GameShelf) CreateGame(name string) (string, string, error) {
 	}
 
 	p := play.New(game.New(gameId, blacks, whites))
+	p.DeleteCallback = gs.DeleteCallback
 	player, _ := p.Game.CreatePlayer(name)
 	p.Game.Mod = player.Name
 
@@ -59,6 +60,7 @@ func (gs *GameShelf) Play(id string) (*play.Play, error) {
 		}
 
 		gs.games[id] = play.New(game)
+		gs.games[id].DeleteCallback = gs.DeleteCallback
 		return gs.games[id], nil
 	}
 }
@@ -81,6 +83,7 @@ func (gs *GameShelf) JoinGame(gameId string, name string) (string, error) {
 		}
 
 		gs.games[gameId] = play.New(game)
+		gs.games[gameId].DeleteCallback = gs.DeleteCallback
 
 		if game.FindPlayer(name) == nil {
 			return gs.JoinGame(gameId, name)
@@ -100,5 +103,16 @@ func (gs *GameShelf) newGameId() string {
 		} else {
 			return gameId
 		}
+	}
+}
+
+func (gs *GameShelf) DeleteCallback(gameCode string) {
+	log.Printf("Deleting game %s", gameCode)
+
+	delete(gs.games, gameCode)
+
+	err := data.Delete(gameCode)
+	if err != nil {
+		log.Printf("Error deleting game %s: %s", gameCode, err.Error())
 	}
 }
