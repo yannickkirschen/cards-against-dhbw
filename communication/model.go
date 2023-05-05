@@ -36,3 +36,7 @@ type BossHasChosenState struct {
 	WinnerCard  string                 `json:"winnerCard"`
 	PlayedCards []*card.Card           `json:"playedCards"`
 }
+
+type PlayerKickAction struct {
+	PlayerName string `json:"playerID"`
+}
