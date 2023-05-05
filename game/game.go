@@ -19,8 +19,8 @@ const (
 	ACTION_FORBIDDEN      = "forbidden"          // Action is forbidden in the current state
 	ACTION_INVALID        = "invalid"            // Invalid action
 
-	STATE_GAME_LOBBY       = "game.joined"     // Players are waiting in the lobby
-	STATE_GAME_READY       = "game.ready"      // Game is ready to be started
+	STATE_GAME_LOBBY       = "game.lobby"      // Players are waiting in the lobby
+	STATE_GAME_READY       = "game.lobby"      // Game is ready to be started
 	STATE_PLAYERS_CHOOSING = "player.choosing" // Players are choosing their white cards
 	STATE_BOSS_CHOOSING    = "boss.choosing"   // Boss is choosing the best white card
 	STATE_ROUND_FINISHED   = "boss.chosen"     // Round is over (boss has chosen a card)
