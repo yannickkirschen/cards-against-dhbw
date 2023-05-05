@@ -40,7 +40,7 @@ func (p *Play) Receive(player string, action string, message any) {
 
 	switch action {
 	case game.ACTION_GAME_JOIN:
-		p.sendLobbyState(game.STATE_GAME_LOBBY, p.Game.State == game.STATE_GAME_READY)
+		p.sendCurrentState(player)
 	case game.ACTION_GAME_START:
 		fallthrough
 	case game.ACTION_ROUND_CONTINUE:
@@ -167,21 +167,24 @@ func (p *Play) handlePlayerLeave(playerName string) {
 		p.sendPlayersChoosingState()
 	} else {
 		p.Game.CurrentRound.RemoveAllForPlayer(player)
+		p.sendCurrentState(playerName)
+	}
+}
 
-		switch p.Game.State {
-		case game.STATE_GAME_LOBBY:
-			p.sendLobbyState(game.STATE_GAME_LOBBY, false)
-		case game.STATE_PLAYERS_CHOOSING:
-			p.sendPlayersChoosingState()
-		case game.STATE_BOSS_CHOOSING:
-			p.sendBossChoosingState()
-		case game.STATE_ROUND_FINISHED:
-			p.sendBossHasChosenState(p.Game.CurrentRound.Winner, p.Game.CurrentRound.PlayedCards[p.Game.CurrentRound.Winner])
-		case game.STATE_GAME_FINISHED:
-			p.sendLobbyState(game.STATE_GAME_FINISHED, true)
-		default:
-			p.sendInvalidState(playerName)
-		}
+func (p *Play) sendCurrentState(playerName string) {
+	switch p.Game.State {
+	case game.STATE_GAME_LOBBY:
+		p.sendLobbyState(game.STATE_GAME_LOBBY, p.Game.State == game.STATE_GAME_READY)
+	case game.STATE_PLAYERS_CHOOSING:
+		p.sendPlayersChoosingState()
+	case game.STATE_BOSS_CHOOSING:
+		p.sendBossChoosingState()
+	case game.STATE_ROUND_FINISHED:
+		p.sendBossHasChosenState(p.Game.CurrentRound.Winner, p.Game.CurrentRound.PlayedCards[p.Game.CurrentRound.Winner])
+	case game.STATE_GAME_FINISHED:
+		p.sendLobbyState(game.STATE_GAME_FINISHED, true)
+	default:
+		p.sendInvalidState(playerName)
 	}
 }
 
