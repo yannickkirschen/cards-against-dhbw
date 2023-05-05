@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"encoding/json"
+	"errors"
 
 	"github.com/redis/go-redis/v9"
 	"github.com/yannickkirschen/cards-against-dhbw/game"
@@ -41,4 +42,15 @@ func FindGame(gameCode string) (*game.Game, error) {
 	}
 
 	return game, nil
+}
+
+func Delete(gameCode string) error {
+	rc, err := GlobalClient.Del(Ctx, gameCode).Result()
+	if err != nil {
+		return err
+	} else if rc == 0 {
+		return errors.New("game does not exist in database")
+	}
+
+	return nil
 }

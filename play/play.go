@@ -11,7 +11,9 @@ import (
 )
 
 type Play struct {
-	Game    *game.Game
+	Game           *game.Game
+	DeleteCallback func(gameCode string)
+
 	senders map[*player.Player]communication.Sender
 }
 
@@ -30,10 +32,6 @@ func (p *Play) Receive(player string, action string, message any) {
 	p.Game.Mutex.Lock()
 	p.Game.UpdateState()
 
-	defer p.Game.UpdateState()
-	defer data.Update(p.Game)
-	defer p.Game.Mutex.Unlock()
-
 	log.Printf("Received message from player %s of type %s for game %s!", player, action, p.Game.Code)
 
 	if !p.Game.StateAllows(action) {
@@ -51,6 +49,7 @@ func (p *Play) Receive(player string, action string, message any) {
 		p.sendPlayersChoosingState()
 	case game.ACTION_GAME_LEAVE:
 		p.handlePlayerLeave(player)
+		return
 	case game.ACTION_CARD_CHOSEN:
 		p.handlePlayerChosenAction(player, message)
 	case game.ACTION_PLAYER_INACTIVE:
@@ -66,6 +65,10 @@ func (p *Play) Receive(player string, action string, message any) {
 	} else if p.Game.State == game.STATE_GAME_FINISHED {
 		p.sendLobbyState(game.STATE_GAME_FINISHED, true)
 	}
+
+	p.Game.UpdateState()
+	data.Update(p.Game)
+	p.Game.Mutex.Unlock()
 }
 
 func (p *Play) sendPlayersChoosingState() {
@@ -79,15 +82,6 @@ func (p *Play) sendPlayersChoosingState() {
 		log.Printf("User: %s (active: %t)", player.Name, player.Active)
 	}
 
-	/*for _, player := range p.Game.Players {
-		state := &communication.PlayerChoosingState{
-			Players:    p.Game.GeneratePublicPlayers(),
-			BlackCard:  p.Game.CurrentRound.BlackCard,
-			WhiteCards: p.Game.CurrentRound.WhiteCards[player.Name],
-		}
-
-		p.senders[player].Send(game.STATE_PLAYERS_CHOOSING, state)
-	}*/
 	for player, sender := range p.senders {
 		state := &communication.PlayerChoosingState{
 			Players:    p.Game.GeneratePublicPlayers(),
@@ -98,8 +92,6 @@ func (p *Play) sendPlayersChoosingState() {
 		sender.Send(game.STATE_PLAYERS_CHOOSING, state)
 		log.Printf("Sent state '%s' to player %s for game %s!", game.STATE_PLAYERS_CHOOSING, player.Name, p.Game.Code)
 	}
-
-	//log.Printf("Sent state '%s' to all players for game %s!", game.STATE_PLAYERS_CHOOSING, p.Game.Code)
 }
 
 func (p *Play) sendBossChoosingState() {
@@ -176,8 +168,12 @@ func (p *Play) handlePlayerLeave(playerName string) {
 	}
 
 	p.Game.RemovePlayer(player)
+	log.Printf("Player %s left game %s!", player.Name, p.Game.Code)
 
-	if len(p.Game.Players) < 2 {
+	if len(p.Game.Players) == 0 {
+		p.DeleteCallback(p.Game.Code)
+		return
+	} else if len(p.Game.Players) < 2 {
 		p.Game.State = game.STATE_GAME_LOBBY
 		p.Game.CurrentRound = nil
 		p.sendLobbyState(game.STATE_GAME_LOBBY, false)
@@ -197,6 +193,8 @@ func (p *Play) handlePlayerLeave(playerName string) {
 		p.Game.CurrentRound.RemoveAllForPlayer(player)
 		p.sendCurrentState(playerName)
 	}
+
+	p.Game.UpdateState()
 }
 
 func (p *Play) sendCurrentState(playerName string) {

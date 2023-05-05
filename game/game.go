@@ -163,6 +163,9 @@ func (g *Game) RemovePlayer(player *player.Player) {
 	}
 
 	g.Players = append(g.Players[:index], g.Players[index+1:]...)
+	if g.Mod == player.Name {
+		g.Mod = ""
+	}
 }
 
 func (g *Game) PlayerNameExists(name string) bool {
