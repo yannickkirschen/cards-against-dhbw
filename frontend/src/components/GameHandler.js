@@ -33,6 +33,7 @@ class GameHandler extends Component {
         this.onCardSelection = this.onCardSelection.bind(this);
         this.leaveGame = this.leaveGame.bind(this);
         this.findWinner = this.findWinner.bind(this);
+        this.kickPlayer = this.kickPlayer.bind(this);
         this.clearGame = this.clearGame.bind(this);
 
     }
@@ -88,13 +89,17 @@ class GameHandler extends Component {
         this.props.navigate("/")
     }
 
+    kickPlayer(playerId) {
+        this.context.emit("player.kick", JSON.stringify({ playerID: playerId }))
+    }
+
     clearGame(reason) {
         localStorage.clear();
         this.setState({ player: [], whiteCards: [], blackCard: null, playedCards: [], actionState: reason !== null ? reason : "" })
     }
 
     componentWillUnmount() {
-        this.leaveGame();
+        //this.leaveGame();
     }
 
     componentDidMount() {
@@ -158,7 +163,6 @@ class GameHandler extends Component {
 
     render() {
         if (this.state.actionState !== "invalidCode") {
-            console.log(this.isPlayerType(e => e.isMod))
             return (
                 <div className="gameHandler-container">
                     <div className="gameHandler-infoArea">
@@ -221,7 +225,7 @@ class GameHandler extends Component {
                     <div className="gameHandler-playerList">
                         <h4>Player:</h4> <br />
                         <div className="gameHandler-playerList-innerContainer">
-                            <ListPlayer player={this.state.player} />
+                            {this.isPlayerType(e => e.isMod) ? <ListPlayer player={this.state.player} /> : <ListPlayer player={this.state.player} kickHandler={this.kickPlayer} />}
                         </div>
                         <Button variant='contained' color="error" onClick={this.leaveGame}>Leave Game</Button>
                     </div>

@@ -38,6 +38,7 @@ func InitServerSession() *socket.Server {
 	server.OnEvent("/", "cardChosenAction", onEventCardChosen)
 	server.OnEvent("/", "mod.round.continue", onEventRoundContinue)
 	server.OnEvent("/", "game.leave", onEventLeaveGame)
+	server.OnEvent("/", "player.kick", onKickEvent)
 	server.OnEvent("/", "notice", onEventNotice)
 	server.OnError("/", onError)
 	server.OnDisconnect("/", onDisconnect)
@@ -133,6 +134,20 @@ func onEventLeaveGame(s socket.Conn, msg string) string {
 
 	gp.Receive(p.PlayerID, "game.leave", msg)
 	return fmt.Sprintf("Player %s left the game!", p.PlayerID)
+}
+
+func onKickEvent(s socket.Conn, msg string) string {
+	var p communication.JoinRequestAction = s.Context().(communication.JoinRequestAction)
+	log.Printf("Game %s (socket): received message that mod %s kicks a player!", p.GameID, p.PlayerID)
+
+	gp, err := shelf.GlobalShelf.Play(p.GameID)
+	if err != nil {
+		log.Printf("Game %s (socket): game not found, player %s cannot kick another player!", p.GameID, p.PlayerID)
+		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot kick another player!", p.GameID, p.PlayerID)
+	}
+	gp.Receive(p.PlayerID, "player.kick", msg)
+	return fmt.Sprintf("Player %s kicked another!", p.PlayerID)
+
 }
 
 func onEventNotice(s socket.Conn, msg string) {
