@@ -180,7 +180,7 @@ func (p *Play) sendCurrentState(playerName string) {
 	case game.STATE_GAME_LOBBY:
 		p.sendLobbyState(game.STATE_GAME_LOBBY, false)
 	case game.STATE_GAME_READY:
-		p.sendLobbyState(game.STATE_GAME_READY, true)
+		p.sendLobbyState(game.STATE_GAME_LOBBY, true)
 	case game.STATE_PLAYERS_CHOOSING:
 		p.sendPlayersChoosingState()
 	case game.STATE_BOSS_CHOOSING:
