@@ -17,6 +17,7 @@ const (
 	ACTION_CARD_CHOSEN     = "entity.card.chosen" // Player has chosen a card (black or white)
 	ACTION_ROUND_CONTINUE  = "mod.round.continue" // MOD wants to continue the round
 	ACTION_PLAYER_INACTIVE = "player.inactive"    // Player is inactive
+	ACTION_PLAYER_KICK     = "player.kick"        // MOD wants to kick a player
 	ACTION_FORBIDDEN       = "forbidden"          // Action is forbidden in the current state
 	ACTION_INVALID         = "invalid"            // Invalid action
 

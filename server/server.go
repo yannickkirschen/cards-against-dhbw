@@ -146,7 +146,14 @@ func onKickEvent(s socket.Conn, msg string) string {
 		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot kick another player!", p.GameID, p.PlayerID)
 	}
 
-	gp.Receive(p.PlayerID, "player.kick", msg)
+	var action communication.PlayerKickAction
+	err = json.Unmarshal([]byte(msg), &action)
+	if err != nil {
+		log.Printf("Game %s (socket): error while parsing player kick action: %s", p.GameID, err)
+		return fmt.Sprintf("Game %s (socket): error while parsing player kick action: %s", p.GameID, err)
+	}
+
+	gp.Receive(p.PlayerID, "player.kick", action)
 	return fmt.Sprintf("Player %s kicked another!", p.PlayerID)
 }
 
@@ -162,6 +169,10 @@ func onError(s socket.Conn, e error) {
 
 	gp, err := shelf.GlobalShelf.Play(p.GameID)
 	if err != nil {
+		return
+	}
+	if e.Error() == "websocket: close 1001 (going away)" || e.Error() == "websocket: close sent" {
+		log.Printf("Ignoring error: %s", e.Error())
 		return
 	}
 

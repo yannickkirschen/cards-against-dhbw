@@ -41,6 +41,7 @@ func (p *Play) Receive(player string, action string, message any) {
 	switch action {
 	case game.ACTION_GAME_JOIN:
 		p.Game.FindPlayer(player).Active = true
+		log.Printf("Set player %s active!", player)
 		p.sendCurrentState(player)
 	case game.ACTION_GAME_START:
 		fallthrough
@@ -54,6 +55,10 @@ func (p *Play) Receive(player string, action string, message any) {
 		p.handlePlayerChosenAction(player, message)
 	case game.ACTION_PLAYER_INACTIVE:
 		p.Game.FindPlayer(player).Active = false
+		log.Printf("Set player %s inactive!", player)
+		p.sendCurrentState(player)
+	case game.ACTION_PLAYER_KICK:
+		p.handlePlayerKick(player, message)
 		p.sendCurrentState(player)
 	default:
 		p.sendInvalidState(player)
@@ -195,6 +200,22 @@ func (p *Play) handlePlayerLeave(playerName string) {
 	}
 
 	p.Game.UpdateState()
+}
+
+func (p *Play) handlePlayerKick(playerName string, message any) {
+	if p.Game.Mod != playerName {
+		log.Printf("Player %s is not MOD and cannot kick players from game %s!", playerName, p.Game.Code)
+		return
+	}
+
+	action, ok := message.(communication.PlayerKickAction)
+	player := p.Game.FindPlayer(action.PlayerName)
+
+	if !ok || player == nil {
+		return
+	}
+
+	p.handlePlayerLeave(player.Name)
 }
 
 func (p *Play) sendCurrentState(playerName string) {
