@@ -111,9 +111,10 @@ class GameHandler extends Component {
             this.context.emit("join", JSON.stringify({ gameID: localStorage.getItem("gameID"), playerID: localStorage.getItem("playerID") }))
         }
 
-        // socket = io.connect("http://192.168.0.26:3333/", { transports: ['websocket', 'polling'] })
-        // const socket = io.connect("http://localhost:3333/", { transports: ['websocket', 'polling'] })
-        //this.didUnMount = () => { this.context.disconnect(); console.log("disconnected ") }
+        this.context.on("reconnect", attempts => {
+            console.log("reconnected to server")
+            this.context.emit("join", JSON.stringify({ gameID: localStorage.getItem("gameID"), playerID: localStorage.getItem("playerID") }))
+        })
 
         this.context.on("invalidCodeState", data => {
             this.setState({ actionState: "invalidCode" })
@@ -158,7 +159,6 @@ class GameHandler extends Component {
         this.context.on("game.abort", data => {
             this.clearGame("game.abort")
         })
-
     }
 
     render() {
