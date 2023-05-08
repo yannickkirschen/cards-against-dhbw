@@ -1,67 +1,77 @@
 package play
 
 import (
+	"errors"
 	"log"
 
 	"github.com/yannickkirschen/cards-against-dhbw/card"
 	"github.com/yannickkirschen/cards-against-dhbw/communication"
 	"github.com/yannickkirschen/cards-against-dhbw/data"
+	"github.com/yannickkirschen/cards-against-dhbw/err"
 	"github.com/yannickkirschen/cards-against-dhbw/game"
-	"github.com/yannickkirschen/cards-against-dhbw/player"
 )
 
 type Play struct {
 	Game           *game.Game
 	DeleteCallback func(gameCode string)
 
-	senders map[*player.Player]communication.Sender
+	senders map[string]communication.Sender
 }
 
 func New(game *game.Game) *Play {
 	return &Play{
 		Game:    game,
-		senders: make(map[*player.Player]communication.Sender),
+		senders: make(map[string]communication.Sender),
 	}
 }
 
-func (p *Play) AddSender(playerName string, sender communication.Sender) {
-	p.senders[p.Game.FindPlayer(playerName)] = sender
+func (p *Play) AddSender(playerName string, sender communication.Sender) error {
+	player := p.Game.FindPlayer(playerName)
+	if player == nil {
+		return errors.New("player not found")
+	}
+
+	p.senders[player.Name] = sender
+	return nil
 }
 
-func (p *Play) Receive(player string, action string, message any) {
+func (p *Play) Receive(playerName string, action string, message any) {
 	p.Game.Mutex.Lock()
 	p.Game.UpdateState()
 
-	log.Printf("Received message from player %s of type %s for game %s!", player, action, p.Game.Code)
+	defer p.Game.Mutex.Unlock()
+
+	log.Printf("Received message from player %s of type %s for game %s!", playerName, action, p.Game.Code)
 
 	if !p.Game.StateAllows(action) {
-		// TODO: send ACTION_FORBIDDEN
+		p.sendError(playerName, err.ACTION_FORBIDDEN, action)
+		return
 	}
 
 	switch action {
 	case game.ACTION_GAME_JOIN:
-		p.Game.FindPlayer(player).Active = true
-		log.Printf("Set player %s active!", player)
-		p.sendCurrentState(player)
+		p.Game.FindPlayer(playerName).Active = true
+		log.Printf("Set player %s active!", playerName)
+		p.sendCurrentState(playerName)
 	case game.ACTION_GAME_START:
 		fallthrough
 	case game.ACTION_ROUND_CONTINUE:
 		p.Game.StartNewRound()
 		p.sendPlayersChoosingState()
 	case game.ACTION_GAME_LEAVE:
-		p.handlePlayerLeave(player)
+		p.handlePlayerLeave(playerName)
 		return
 	case game.ACTION_CARD_CHOSEN:
-		p.handlePlayerChosenAction(player, message)
+		p.handlePlayerChosenAction(playerName, message)
 	case game.ACTION_PLAYER_INACTIVE:
-		p.Game.FindPlayer(player).Active = false
-		log.Printf("Set player %s inactive!", player)
-		p.sendCurrentState(player)
+		p.Game.FindPlayer(playerName).Active = false
+		log.Printf("Set player %s inactive!", playerName)
+		p.sendCurrentState(playerName)
 	case game.ACTION_PLAYER_KICK:
-		p.handlePlayerKick(player, message)
-		p.sendCurrentState(player)
+		p.handlePlayerKick(playerName, message)
+		p.sendCurrentState(playerName)
 	default:
-		p.sendInvalidState(player)
+		p.sendError(playerName, err.INVALID_STATE, p.Game.State)
 	}
 
 	p.Game.UpdateState()
@@ -73,29 +83,18 @@ func (p *Play) Receive(player string, action string, message any) {
 
 	p.Game.UpdateState()
 	data.Update(p.Game)
-	p.Game.Mutex.Unlock()
 }
 
 func (p *Play) sendPlayersChoosingState() {
-	log.Printf("There are %d senders", len(p.senders))
-	for key := range p.senders {
-		log.Printf("Sender: %s (active: %t)", key.Name, key.Active)
-	}
-
-	log.Printf("There are %d users", len(p.Game.Players))
-	for _, player := range p.Game.Players {
-		log.Printf("User: %s (active: %t)", player.Name, player.Active)
-	}
-
 	for player, sender := range p.senders {
 		state := &communication.PlayerChoosingState{
 			Players:    p.Game.GeneratePublicPlayers(),
 			BlackCard:  p.Game.CurrentRound.BlackCard,
-			WhiteCards: p.Game.CurrentRound.WhiteCards[player.Name],
+			WhiteCards: p.Game.CurrentRound.WhiteCards[player],
 		}
 
 		sender.Send(game.STATE_PLAYERS_CHOOSING, state)
-		log.Printf("Sent state '%s' to player %s for game %s!", game.STATE_PLAYERS_CHOOSING, player.Name, p.Game.Code)
+		log.Printf("Sent state '%s' to player %s for game %s!", game.STATE_PLAYERS_CHOOSING, player, p.Game.Code)
 	}
 }
 
@@ -120,12 +119,28 @@ func (p *Play) handlePlayerChosenAction(playerName string, message any) {
 	}
 
 	if p.Game.State == game.STATE_PLAYERS_CHOOSING {
-		card := p.Game.CurrentRound.FindCardFor(player, action.Id)
+		card := p.Game.CurrentRound.FindCardFor(player, action.CardId)
+		if card == nil {
+			p.sendError(playerName, err.CARD_NOT_FOUND, action.CardId)
+			return
+		}
+
 		p.Game.CurrentRound.PlayedCards[player.Name] = card
 		p.Game.CurrentRound.RemoveCardFor(player, card)
 		p.sendPlayersChoosingState()
 	} else if p.Game.State == game.STATE_BOSS_CHOOSING {
-		winnerPlayer := p.Game.FindPlayer(p.Game.CurrentRound.WhoPlayed(action.Id))
+		playerName := p.Game.CurrentRound.WhoPlayed(action.CardId)
+		if playerName == "" {
+			p.sendError(playerName, err.CARD_NOT_PLAYED, action.CardId)
+			return
+		}
+
+		winnerPlayer := p.Game.FindPlayer(playerName)
+		if winnerPlayer == nil {
+			p.sendError(p.Game.CurrentRound.Boss, err.PLAYER_NOT_FOUND, playerName)
+			return
+		}
+
 		winnerPlayer.Points++
 		winnerCard := p.Game.CurrentRound.PlayedCards[winnerPlayer.Name]
 		p.Game.CurrentRound.Winner = winnerPlayer.Name
@@ -205,13 +220,19 @@ func (p *Play) handlePlayerLeave(playerName string) {
 func (p *Play) handlePlayerKick(playerName string, message any) {
 	if p.Game.Mod != playerName {
 		log.Printf("Player %s is not MOD and cannot kick players from game %s!", playerName, p.Game.Code)
+		p.sendError(playerName, err.ACTION_FORBIDDEN, game.ACTION_PLAYER_KICK)
 		return
 	}
 
 	action, ok := message.(communication.PlayerKickAction)
-	player := p.Game.FindPlayer(action.PlayerName)
+	if !ok {
+		p.sendError(playerName, err.BAD_REQUEST, game.ACTION_PLAYER_KICK)
+		return
+	}
 
-	if !ok || player == nil {
+	player := p.Game.FindPlayer(action.PlayerName)
+	if player == nil {
+		p.sendError(playerName, err.PLAYER_NOT_FOUND, action.PlayerName)
 		return
 	}
 
@@ -235,11 +256,16 @@ func (p *Play) sendCurrentState(playerName string) {
 	case game.STATE_GAME_FINISHED:
 		p.sendLobbyState(game.STATE_GAME_FINISHED, true)
 	default:
-		p.sendInvalidState(playerName)
+		p.sendError(playerName, err.INVALID_STATE, p.Game.State)
 	}
 }
 
-func (p *Play) sendInvalidState(player string) {
-	p.senders[p.Game.FindPlayer(player)].Send(game.STATE_INVALID, "")
-	log.Printf("Sent invalid state to player %s for game %s!", player, p.Game.Code)
+func (p *Play) sendError(playerName string, label string, payload any) {
+	state := &communication.ApplicationError{
+		Label:   label,
+		Payload: payload,
+	}
+
+	p.senders[playerName].Send(game.STATE_ROUND_FINISHED, state)
+	log.Printf("Sent error '%s' to player %s for game %s!", label, playerName, p.Game.Code)
 }

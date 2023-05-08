@@ -40,13 +40,13 @@ func handleNewGameGet(w http.ResponseWriter, r *http.Request) {
 
 	name := r.URL.Query().Get("name")
 	if name == "" {
-		log.Print("No game ID given in query parameters (name is empty). Returning 400 Bad Request.")
+		log.Print("No game code given in query parameters (name is empty). Returning 400 Bad Request.")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("no name given"))
 		return
 	}
 
-	gameId, playerId, err := shelf.GlobalShelf.CreateGame(name)
+	gameCode, playerName, err := shelf.GlobalShelf.CreateGame(name)
 	if err != nil {
 		log.Printf("Error creating game: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -55,8 +55,8 @@ func handleNewGameGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := &response{
-		GameId: gameId,
-		Player: playerId,
+		GameCode:   gameCode,
+		PlayerName: playerName,
 	}
 
 	b, err := json.Marshal(response)
@@ -64,6 +64,7 @@ func handleNewGameGet(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error converting game creation response to JSON: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(fmt.Sprintf("Error converting response to JSON: %s", err.Error())))
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -76,9 +77,9 @@ func handleJoinGameGet(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 	w.Header().Add("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 
-	gameId, err := utils.PathParameterFilter(r.URL.Path, "/v1/join/")
+	gameCode, err := utils.PathParameterFilter(r.URL.Path, "/v1/join/")
 	if err != nil {
-		log.Printf("Error parsing game ID from URL: %s", err.Error())
+		log.Printf("Error parsing game code from URL: %s", err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
 		return
@@ -86,22 +87,22 @@ func handleJoinGameGet(w http.ResponseWriter, r *http.Request) {
 
 	name := r.URL.Query().Get("name")
 	if name == "" {
-		log.Print("No game ID given in query parameters (name is empty). Returning 400 Bad Request.")
+		log.Print("No game code given in query parameters (name is empty). Returning 400 Bad Request.")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("no name given"))
 		return
 	}
 
-	playerId, err := shelf.GlobalShelf.JoinGame(gameId, name)
+	playerName, err := shelf.GlobalShelf.JoinGame(gameCode, name)
 	switch err {
 	case shelf.ErrNotFound:
-		log.Printf("Player %s cannot join game %s as it does not exist. Error was: %s", name, gameId, err.Error())
+		log.Printf("Player %s cannot join game %s as it does not exist. Error was: %s", name, gameCode, err.Error())
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("Game not found"))
 	case nil:
 		response := &response{
-			GameId: gameId,
-			Player: playerId,
+			GameCode:   gameCode,
+			PlayerName: playerName,
 		}
 
 		b, err := json.Marshal(response)
@@ -120,6 +121,6 @@ func handleJoinGameGet(w http.ResponseWriter, r *http.Request) {
 }
 
 type response struct {
-	GameId string `json:"gameId"`
-	Player string `json:"playerId"`
+	GameCode   string `json:"gameCode"`
+	PlayerName string `json:"playerName"`
 }

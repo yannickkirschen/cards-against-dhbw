@@ -48,7 +48,7 @@ func InitServerSession() *socket.Server {
 }
 
 func onConnect(s socket.Conn) error {
-	var p communication.JoinRequestAction = communication.JoinRequestAction{GameID: "unregistered", PlayerID: "unregistered"}
+	var p communication.JoinRequestAction = communication.JoinRequestAction{GameCode: "unregistered", PlayerName: "unregistered"}
 	s.SetContext(p)
 
 	log.Printf("Socket connection created.")
@@ -60,101 +60,105 @@ func onEventJoin(s socket.Conn, msg string) string {
 	json.Unmarshal([]byte(msg), &p)
 	s.SetContext(p)
 
-	log.Printf("Game %s: received message from player %s to join the game!", p.GameID, p.PlayerID)
+	log.Printf("Game %s: received message from player %s to join the game!", p.GameCode, p.PlayerName)
 
-	gp, err := shelf.GlobalShelf.Play(p.GameID)
+	gp, err := shelf.GlobalShelf.Play(p.GameCode)
 	if err != nil {
-		log.Printf("Game %s (socket): game not found, player %s cannot join the game!", p.GameID, p.PlayerID)
-		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot join the game!", p.GameID, p.PlayerID)
+		log.Printf("Game %s (socket): game not found, player %s cannot join the game!", p.GameCode, p.PlayerName)
+		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot join the game!", p.GameCode, p.PlayerName)
 	}
 
-	gp.AddSender(p.PlayerID, &socketSender{f: s.Emit})
-	gp.Receive(p.PlayerID, "game.join", msg)
-	return fmt.Sprintf("Player %s joined the game!", p.PlayerID)
+	err = gp.AddSender(p.PlayerName, &socketSender{f: s.Emit})
+	if err != nil {
+		// TODO: handle error
+	}
+
+	gp.Receive(p.PlayerName, "game.join", msg)
+	return fmt.Sprintf("Player %s joined the game!", p.PlayerName)
 }
 
 func onEventGameStart(s socket.Conn, msg string) string {
 	var p communication.JoinRequestAction = s.Context().(communication.JoinRequestAction)
-	log.Printf("Game %s (socket): received message from player %s to start the game!", p.GameID, p.PlayerID)
+	log.Printf("Game %s (socket): received message from player %s to start the game!", p.GameCode, p.PlayerName)
 
-	gp, err := shelf.GlobalShelf.Play(p.GameID)
+	gp, err := shelf.GlobalShelf.Play(p.GameCode)
 	if err != nil {
-		log.Printf("Game %s (socket): game not found, player %s cannot start the game!", p.GameID, p.PlayerID)
-		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot start the game!", p.GameID, p.PlayerID)
+		log.Printf("Game %s (socket): game not found, player %s cannot start the game!", p.GameCode, p.PlayerName)
+		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot start the game!", p.GameCode, p.PlayerName)
 	}
 
-	gp.Receive(p.PlayerID, "game.start", msg)
-	return fmt.Sprintf("Player %s started the game!", p.PlayerID)
+	gp.Receive(p.PlayerName, "game.start", msg)
+	return fmt.Sprintf("Player %s started the game!", p.PlayerName)
 }
 
 func onEventCardChosen(s socket.Conn, msg string) string {
 	var p communication.JoinRequestAction = s.Context().(communication.JoinRequestAction)
-	log.Printf("Game %s (socket): received message that player %s chose a card!", p.GameID, p.PlayerID)
+	log.Printf("Game %s (socket): received message that player %s chose a card!", p.GameCode, p.PlayerName)
 
-	gp, err := shelf.GlobalShelf.Play(p.GameID)
+	gp, err := shelf.GlobalShelf.Play(p.GameCode)
 	if err != nil {
-		log.Printf("Game %s (socket): game not found, player %s cannot choose a card!", p.GameID, p.PlayerID)
-		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot choose a card!", p.GameID, p.PlayerID)
+		log.Printf("Game %s (socket): game not found, player %s cannot choose a card!", p.GameCode, p.PlayerName)
+		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot choose a card!", p.GameCode, p.PlayerName)
 	}
 
 	var action communication.CardChosenAction
 	err = json.Unmarshal([]byte(msg), &action)
 	if err != nil {
-		log.Printf("Game %s (socket): error while parsing card chosen action: %s", p.GameID, err)
-		return fmt.Sprintf("Game %s (socket): error while parsing card chosen action: %s", p.GameID, err)
+		log.Printf("Game %s (socket): error while parsing card chosen action: %s", p.GameCode, err)
+		return fmt.Sprintf("Game %s (socket): error while parsing card chosen action: %s", p.GameCode, err)
 	}
 
-	gp.Receive(p.PlayerID, "entity.card.chosen", action)
-	return fmt.Sprintf("Player %s chose a card!", p.PlayerID)
+	gp.Receive(p.PlayerName, "entity.card.chosen", action)
+	return fmt.Sprintf("Player %s chose a card!", p.PlayerName)
 }
 
 func onEventRoundContinue(s socket.Conn, msg string) string {
 	var p communication.JoinRequestAction = s.Context().(communication.JoinRequestAction)
-	log.Printf("Game %s (socket): received message that mod %s chose to continue the round!", p.GameID, p.PlayerID)
+	log.Printf("Game %s (socket): received message that mod %s chose to continue the round!", p.GameCode, p.PlayerName)
 
-	gp, err := shelf.GlobalShelf.Play(p.GameID)
+	gp, err := shelf.GlobalShelf.Play(p.GameCode)
 	if err != nil {
-		log.Printf("Game %s (socket): game not found, mod %s cannot choose to continue the round!", p.GameID, p.PlayerID)
-		return fmt.Sprintf("Game %s (socket): game not found, mod %s cannot choose to continue the round!", p.GameID, p.PlayerID)
+		log.Printf("Game %s (socket): game not found, mod %s cannot choose to continue the round!", p.GameCode, p.PlayerName)
+		return fmt.Sprintf("Game %s (socket): game not found, mod %s cannot choose to continue the round!", p.GameCode, p.PlayerName)
 	}
 
-	gp.Receive(p.PlayerID, "mod.round.continue", msg)
-	return fmt.Sprintf("MOD %s chose to continue the round!", p.PlayerID)
+	gp.Receive(p.PlayerName, "mod.round.continue", msg)
+	return fmt.Sprintf("MOD %s chose to continue the round!", p.PlayerName)
 }
 
 func onEventLeaveGame(s socket.Conn, msg string) string {
 	var p communication.JoinRequestAction = s.Context().(communication.JoinRequestAction)
-	log.Printf("Game %s (socket): received message that player %s wants to leave the game!", p.GameID, p.PlayerID)
+	log.Printf("Game %s (socket): received message that player %s wants to leave the game!", p.GameCode, p.PlayerName)
 
-	gp, err := shelf.GlobalShelf.Play(p.GameID)
+	gp, err := shelf.GlobalShelf.Play(p.GameCode)
 	if err != nil {
-		log.Printf("Game %s (socket): game not found, player %s cannot leave the game!", p.GameID, p.PlayerID)
-		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot leave the game!", p.GameID, p.PlayerID)
+		log.Printf("Game %s (socket): game not found, player %s cannot leave the game!", p.GameCode, p.PlayerName)
+		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot leave the game!", p.GameCode, p.PlayerName)
 	}
 
-	gp.Receive(p.PlayerID, "game.leave", msg)
-	return fmt.Sprintf("Player %s left the game!", p.PlayerID)
+	gp.Receive(p.PlayerName, "game.leave", msg)
+	return fmt.Sprintf("Player %s left the game!", p.PlayerName)
 }
 
 func onKickEvent(s socket.Conn, msg string) string {
 	var p communication.JoinRequestAction = s.Context().(communication.JoinRequestAction)
-	log.Printf("Game %s (socket): received message that mod %s kicks a player!", p.GameID, p.PlayerID)
+	log.Printf("Game %s (socket): received message that mod %s kicks a player!", p.GameCode, p.PlayerName)
 
-	gp, err := shelf.GlobalShelf.Play(p.GameID)
+	gp, err := shelf.GlobalShelf.Play(p.GameCode)
 	if err != nil {
-		log.Printf("Game %s (socket): game not found, player %s cannot kick another player!", p.GameID, p.PlayerID)
-		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot kick another player!", p.GameID, p.PlayerID)
+		log.Printf("Game %s (socket): game not found, player %s cannot kick another player!", p.GameCode, p.PlayerName)
+		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot kick another player!", p.GameCode, p.PlayerName)
 	}
 
 	var action communication.PlayerKickAction
 	err = json.Unmarshal([]byte(msg), &action)
 	if err != nil {
-		log.Printf("Game %s (socket): error while parsing player kick action: %s", p.GameID, err)
-		return fmt.Sprintf("Game %s (socket): error while parsing player kick action: %s", p.GameID, err)
+		log.Printf("Game %s (socket): error while parsing player kick action: %s", p.GameCode, err)
+		return fmt.Sprintf("Game %s (socket): error while parsing player kick action: %s", p.GameCode, err)
 	}
 
-	gp.Receive(p.PlayerID, "player.kick", action)
-	return fmt.Sprintf("Player %s kicked another!", p.PlayerID)
+	gp.Receive(p.PlayerName, "player.kick", action)
+	return fmt.Sprintf("Player %s kicked another!", p.PlayerName)
 }
 
 func onEventNotice(s socket.Conn, msg string) {
@@ -165,9 +169,9 @@ func onEventNotice(s socket.Conn, msg string) {
 
 func onError(s socket.Conn, e error) {
 	var p communication.JoinRequestAction = s.Context().(communication.JoinRequestAction)
-	log.Printf("Game %s (socket): error occurred: %s", p.GameID, e.Error())
+	log.Printf("Game %s (socket): error occurred: %s", p.GameCode, e.Error())
 
-	gp, err := shelf.GlobalShelf.Play(p.GameID)
+	gp, err := shelf.GlobalShelf.Play(p.GameCode)
 	if err != nil {
 		return
 	}
@@ -176,17 +180,17 @@ func onError(s socket.Conn, e error) {
 		return
 	}
 
-	gp.Receive(p.PlayerID, "game.leave", "")
+	gp.Receive(p.PlayerName, "game.leave", "")
 }
 
 func onDisconnect(s socket.Conn, reason string) {
 	var p communication.JoinRequestAction = s.Context().(communication.JoinRequestAction)
-	log.Printf("Game %s (socket): connection %s closed: %s", p.GameID, s.ID(), reason)
+	log.Printf("Game %s (socket): connection %s closed: %s", p.GameCode, s.ID(), reason)
 
-	gp, err := shelf.GlobalShelf.Play(p.GameID)
+	gp, err := shelf.GlobalShelf.Play(p.GameCode)
 	if err != nil {
 		return
 	}
 
-	gp.Receive(p.PlayerID, "player.inactive", "")
+	gp.Receive(p.PlayerName, "player.inactive", "")
 }
