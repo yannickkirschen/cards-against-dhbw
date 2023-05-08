@@ -13,6 +13,7 @@ import (
 	"github.com/googollee/go-socket.io/engineio/transport/polling"
 	"github.com/googollee/go-socket.io/engineio/transport/websocket"
 	"github.com/yannickkirschen/cards-against-dhbw/communication"
+	"github.com/yannickkirschen/cards-against-dhbw/game"
 	"github.com/yannickkirschen/cards-against-dhbw/shelf"
 )
 
@@ -33,12 +34,12 @@ func InitServerSession() *socket.Server {
 	})
 
 	server.OnConnect("/", onConnect)
-	server.OnEvent("/", "join", onEventJoin)
-	server.OnEvent("/", "game.start", onEventGameStart)
-	server.OnEvent("/", "cardChosenAction", onEventCardChosen)
-	server.OnEvent("/", "mod.round.continue", onEventRoundContinue)
-	server.OnEvent("/", "game.leave", onEventLeaveGame)
-	server.OnEvent("/", "player.kick", onKickEvent)
+	server.OnEvent("/", game.ACTION_GAME_JOIN, onEventJoin)
+	server.OnEvent("/", game.ACTION_GAME_START, onEventGameStart)
+	server.OnEvent("/", game.ACTION_CARD_CHOSEN, onEventCardChosen)
+	server.OnEvent("/", game.ACTION_ROUND_CONTINUE, onEventRoundContinue)
+	server.OnEvent("/", game.ACTION_GAME_LEAVE, onEventLeaveGame)
+	server.OnEvent("/", game.ACTION_PLAYER_KICK, onKickEvent)
 	server.OnEvent("/", "notice", onEventNotice)
 	server.OnError("/", onError)
 	server.OnDisconnect("/", onDisconnect)
@@ -73,7 +74,7 @@ func onEventJoin(s socket.Conn, msg string) string {
 		// TODO: handle error
 	}
 
-	gp.Receive(p.PlayerName, "game.join", msg)
+	gp.Receive(p.PlayerName, game.ACTION_GAME_JOIN, msg)
 	return fmt.Sprintf("Player %s joined the game!", p.PlayerName)
 }
 
@@ -87,7 +88,7 @@ func onEventGameStart(s socket.Conn, msg string) string {
 		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot start the game!", p.GameCode, p.PlayerName)
 	}
 
-	gp.Receive(p.PlayerName, "game.start", msg)
+	gp.Receive(p.PlayerName, game.ACTION_GAME_START, msg)
 	return fmt.Sprintf("Player %s started the game!", p.PlayerName)
 }
 
@@ -122,7 +123,7 @@ func onEventRoundContinue(s socket.Conn, msg string) string {
 		return fmt.Sprintf("Game %s (socket): game not found, mod %s cannot choose to continue the round!", p.GameCode, p.PlayerName)
 	}
 
-	gp.Receive(p.PlayerName, "mod.round.continue", msg)
+	gp.Receive(p.PlayerName, game.ACTION_ROUND_CONTINUE, msg)
 	return fmt.Sprintf("MOD %s chose to continue the round!", p.PlayerName)
 }
 
@@ -136,7 +137,7 @@ func onEventLeaveGame(s socket.Conn, msg string) string {
 		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot leave the game!", p.GameCode, p.PlayerName)
 	}
 
-	gp.Receive(p.PlayerName, "game.leave", msg)
+	gp.Receive(p.PlayerName, game.ACTION_GAME_LEAVE, msg)
 	return fmt.Sprintf("Player %s left the game!", p.PlayerName)
 }
 
@@ -157,7 +158,7 @@ func onKickEvent(s socket.Conn, msg string) string {
 		return fmt.Sprintf("Game %s (socket): error while parsing player kick action: %s", p.GameCode, err)
 	}
 
-	gp.Receive(p.PlayerName, "player.kick", action)
+	gp.Receive(p.PlayerName, game.ACTION_PLAYER_KICK, action)
 	return fmt.Sprintf("Player %s kicked another!", p.PlayerName)
 }
 
@@ -180,7 +181,7 @@ func onError(s socket.Conn, e error) {
 		return
 	}
 
-	gp.Receive(p.PlayerName, "game.leave", "")
+	gp.Receive(p.PlayerName, game.ACTION_GAME_LEAVE, "")
 }
 
 func onDisconnect(s socket.Conn, reason string) {

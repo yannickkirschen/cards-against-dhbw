@@ -36,7 +36,7 @@ class GameHandler extends Component {
         this.findWinner = this.findWinner.bind(this);
         this.kickPlayer = this.kickPlayer.bind(this);
         this.clearGame = this.clearGame.bind(this);
-
+        this.isPlayerType = this.isPlayerType.bind(this);
     }
 
     isPlayerType(f) {
@@ -49,7 +49,7 @@ class GameHandler extends Component {
             return false
         }
 
-        return filtered[0].id === localStorage.getItem("playerName")
+        return filtered[0].name === localStorage.getItem("playerName")
     }
 
     loadPlayer(src) {
@@ -84,7 +84,7 @@ class GameHandler extends Component {
     }
 
     onCardSelection(c) {
-        this.context.emit("cardChosenAction", JSON.stringify({ card: c.id }))
+        this.context.emit("entity.card.chosen", JSON.stringify({ cardId: c.id }))
     }
 
     leaveGame() {

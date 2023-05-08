@@ -24,23 +24,23 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Game"
 
-    /join/{id}:
+    /join/{code}:
         get:
             summary: Join a game
             description: Join a game
             operationId: join
 
             parameters:
-                - name: id
+                - name: code
                   in: path
-                  description: Game ID
+                  description: Game code
                   required: true
                   schema:
                       type: string
 
             responses:
                 "200":
-                    description: Metadata for the game containing the player's ID
+                    description: Metadata for the game containing the player's name
                     content:
                         application/json:
                             schema:
@@ -60,5 +60,5 @@ components:
 
                 playerName:
                     type: string
-                    description: Player ID.
+                    description: Player name.
                     example: UGV0ZXI=

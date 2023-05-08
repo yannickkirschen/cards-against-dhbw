@@ -110,6 +110,8 @@ func (g *Game) StateAllows(action string) bool {
 		return g.State == STATE_PLAYERS_CHOOSING || g.State == STATE_BOSS_CHOOSING
 	case ACTION_ROUND_CONTINUE:
 		return g.State == STATE_ROUND_FINISHED
+	case ACTION_PLAYER_KICK:
+		return true // players can always be kicked
 	default:
 		return false
 	}
