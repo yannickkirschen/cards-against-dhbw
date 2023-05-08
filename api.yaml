@@ -58,7 +58,7 @@ components:
                     description: Game identifier used to join the game.
                     example: d84nt8
 
-                playerId:
+                playerName:
                     type: string
                     description: Player ID.
                     example: UGV0ZXI=

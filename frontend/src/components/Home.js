@@ -10,25 +10,25 @@ import './Home.css'
 const Home = () => {
     const navigate = useNavigate();
     const urlID = useParams().id;
-    const [gameID, setGameID] = useState("")
+    const [gameCode, setGameCode] = useState("")
     const [joinName, setJoinName] = useState("")
 
     const [newName, setNewName] = useState("")
 
     useEffect(() => {
         console.log("urlID: " + urlID);
-        setGameID(urlID !== undefined ? urlID : "")
+        setGameCode(urlID !== undefined ? urlID : "")
     }, [])
 
     return (
         <div className='home'>
             <div className='home-join-game'>
                 <h2> Join Game </h2>
-                <TextField fullWidth label="GameID" variant="filled" value={gameID} onChange={(e) => setGameID(e.target.value)} />
+                <TextField fullWidth label="gameCode" variant="filled" value={gameCode} onChange={(e) => setGameCode(e.target.value)} />
                 <br />
                 <TextField fullWidth label="Name" variant="filled" value={joinName} onChange={(e) => setJoinName(e.target.value)} />
                 <br />
-                <Button variant='contained' color='primary' disabled={!gameID || !joinName} onClick={() => joinGame(gameID, joinName, navigate)}>Join Game</Button>
+                <Button variant='contained' color='primary' disabled={!gameCode || !joinName} onClick={() => joinGame(gameCode, joinName, navigate)}>Join Game</Button>
             </div>
             <Divider flexItem />
             <div className='home-create-game'>
