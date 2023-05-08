@@ -28,47 +28,46 @@ func New() *GameShelf {
 	}
 }
 
-func (gs *GameShelf) CreateGame(name string) (string, string, error) {
-	log.Printf("Player %s wants to create a new game!", name)
+func (gs *GameShelf) CreateGame(playerName string) (string, string, error) {
+	log.Printf("Player %s wants to create a new game!", playerName)
 
-	gameId := gs.newGameId()
-	log.Printf("Created a new game ID for the game player %s wants to create. ID: %s", name, gameId)
+	gameCode := gs.newGameCode()
+	log.Printf("Created a new game code for the game player %s wants to create. Code: %s", playerName, gameCode)
 
 	blacks, whites, err := data.ReadCards()
 	if err != nil {
 		return "", "", err
 	}
 
-	p := play.New(game.New(gameId, blacks, whites))
+	p := play.New(game.New(gameCode, blacks, whites))
 	p.DeleteCallback = gs.DeleteCallback
-	player, _ := p.Game.CreatePlayer(name)
+	player, _ := p.Game.CreatePlayer(playerName)
 	p.Game.Mod = player.Name
 
-	gs.games[gameId] = p
-
-	return gameId, player.Name, data.Update(p.Game)
+	gs.games[gameCode] = p
+	return gameCode, player.Name, data.Update(p.Game)
 }
 
-func (gs *GameShelf) Play(id string) (*play.Play, error) {
-	gp, exists := gs.games[id]
+func (gs *GameShelf) Play(gameCode string) (*play.Play, error) {
+	gp, exists := gs.games[gameCode]
 	if exists {
 		return gp, nil
 	} else {
-		game, err := data.FindGame(id)
+		game, err := data.FindGame(gameCode)
 		if err != nil {
 			return nil, ErrNotFound
 		}
 
-		gs.games[id] = play.New(game)
-		gs.games[id].DeleteCallback = gs.DeleteCallback
-		return gs.games[id], nil
+		gs.games[gameCode] = play.New(game)
+		gs.games[gameCode].DeleteCallback = gs.DeleteCallback
+		return gs.games[gameCode], nil
 	}
 }
 
-func (gs *GameShelf) JoinGame(gameId string, name string) (string, error) {
-	log.Printf("Player %s wants to join game %s!", name, gameId)
+func (gs *GameShelf) JoinGame(gameCode string, name string) (string, error) {
+	log.Printf("Player %s wants to join game %s!", name, gameCode)
 
-	gamePlay, ok := gs.games[gameId]
+	gamePlay, ok := gs.games[gameCode]
 	if ok {
 		player, err := gamePlay.Game.CreatePlayer(name)
 		if err != nil {
@@ -77,31 +76,31 @@ func (gs *GameShelf) JoinGame(gameId string, name string) (string, error) {
 
 		return player.Name, nil
 	} else {
-		game, err := data.FindGame(gameId)
+		game, err := data.FindGame(gameCode)
 		if err != nil {
 			return "", ErrNotFound
 		}
 
-		gs.games[gameId] = play.New(game)
-		gs.games[gameId].DeleteCallback = gs.DeleteCallback
+		gs.games[gameCode] = play.New(game)
+		gs.games[gameCode].DeleteCallback = gs.DeleteCallback
 
 		if game.FindPlayer(name) == nil {
-			return gs.JoinGame(gameId, name)
+			return gs.JoinGame(gameCode, name)
 		} else {
 			return name, nil
 		}
 	}
 }
 
-func (gs *GameShelf) newGameId() string {
-	gameId := utils.RandString(gs.r, 4)
+func (gs *GameShelf) newGameCode() string {
+	gameCode := utils.RandString(gs.r, 4)
 	for {
-		_, exists := gs.games[gameId]
+		_, exists := gs.games[gameCode]
 
 		if exists {
-			gameId = utils.RandString(gs.r, 4)
+			gameCode = utils.RandString(gs.r, 4)
 		} else {
-			return gameId
+			return gameCode
 		}
 	}
 }

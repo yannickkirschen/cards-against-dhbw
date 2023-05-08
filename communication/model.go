@@ -6,11 +6,9 @@ import (
 )
 
 type JoinRequestAction struct {
-	GameID   string `json:"gameID"`
-	PlayerID string `json:"playerID"`
+	GameCode   string `json:"gameCode"`
+	PlayerName string `json:"playerName"`
 }
-
-type InvalidState struct{}
 
 type LobbyState struct {
 	Players   []*player.PublicPlayer `json:"players"`
@@ -26,7 +24,7 @@ type PlayerChoosingState struct {
 }
 
 type CardChosenAction struct {
-	Id string `json:"card"`
+	CardId string `json:"cardId"`
 }
 
 type BossHasChosenState struct {
@@ -38,5 +36,10 @@ type BossHasChosenState struct {
 }
 
 type PlayerKickAction struct {
-	PlayerName string `json:"playerID"`
+	PlayerName string `json:"playerName"`
+}
+
+type ApplicationError struct {
+	Label   string `json:"label"`
+	Payload any    `json:"payload"`
 }
