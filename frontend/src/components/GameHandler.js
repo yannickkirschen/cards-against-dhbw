@@ -88,7 +88,7 @@ class GameHandler extends Component {
     }
 
     onCardDelete(c) {
-        this.context.emit("player.card.delete", JSON.stringify({ cardId: c.id }))
+        this.context.emit("player.card.remove", JSON.stringify({ cardId: c.id }))
     }
 
     leaveGame() {
@@ -174,9 +174,9 @@ class GameHandler extends Component {
                 <div className="gameHandler-whiteCards">
                     <h3>Your Cards:</h3>
                     {this.state.actionState === "player.choosing" && !this.isPlayerType(e => e.isBoss) ?
-                        <ListCards cards={this.state.whiteCards} onCardSelect={this.onCardSelection} />
+                        <ListCards cards={this.state.whiteCards} onCardSelect={this.onCardSelection} onCardDelete={this.onCardDelete} />
                         :
-                        <ListCards cards={this.state.whiteCards} />}
+                        <ListCards cards={this.state.whiteCards} onCardDelete={this.onCardDelete} />}
                 </div>
 
                 {(this.isPlayerType(e => e.isMod) && this.state.actionState === "game.ready") &&

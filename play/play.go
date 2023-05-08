@@ -63,6 +63,8 @@ func (p *Play) Receive(playerName string, action string, message any) {
 		return
 	case game.ACTION_CARD_CHOSEN:
 		p.handlePlayerChosenAction(playerName, message)
+	case game.ACTION_CARD_REMOVE:
+		p.handleCardRemove(playerName, message)
 	case game.ACTION_PLAYER_INACTIVE:
 		p.Game.FindPlayer(playerName).Active = false
 		log.Printf("Set player %s inactive!", playerName)
@@ -150,6 +152,26 @@ func (p *Play) handlePlayerChosenAction(playerName string, message any) {
 		p.Game.UpdateState()
 		p.sendBossHasChosenState(winnerPlayer.Name, winnerCard)
 	}
+}
+
+func (p *Play) handleCardRemove(playerName string, message any) {
+	action, ok := message.(communication.RemoveCardAction)
+	player := p.Game.FindPlayer(playerName)
+
+	if !ok || player == nil {
+		log.Printf("triggered unhandled error: %s", message)
+		return
+	}
+
+	card := p.Game.CurrentRound.FindCardFor(player, action.CardId)
+	if card == nil {
+		p.sendError(playerName, err.CARD_NOT_FOUND, action.CardId)
+		return
+	}
+
+	p.Game.CurrentRound.RemoveCardFor(player, card)
+	log.Printf("Removed card %s from player %s in game %s.", card.Id, playerName, p.Game.Code)
+	p.sendCurrentState(playerName)
 }
 
 func (p *Play) sendBossHasChosenState(winner string, winnerCard *card.Card) {
@@ -240,7 +262,7 @@ func (p *Play) handlePlayerKick(playerName string, message any) {
 }
 
 func (p *Play) sendCurrentState(playerName string) {
-	log.Printf("Sending current state %s for game %s!", p.Game.State, p.Game.Code)
+	log.Printf("Sending current state %s to player %s for game %s!", p.Game.State, playerName, p.Game.Code)
 
 	switch p.Game.State {
 	case game.STATE_GAME_LOBBY:

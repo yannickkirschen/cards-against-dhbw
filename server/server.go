@@ -39,6 +39,7 @@ func InitServerSession() *socket.Server {
 	server.OnEvent("/", game.ACTION_GAME_START, onEventGameStart)
 	server.OnEvent("/", game.ACTION_CARD_CHOSEN, onEventCardChosen)
 	server.OnEvent("/", game.ACTION_ROUND_CONTINUE, onEventRoundContinue)
+	server.OnEvent("/", game.ACTION_CARD_REMOVE, onEventRemoveCard)
 	server.OnEvent("/", game.ACTION_GAME_LEAVE, onEventLeaveGame)
 	server.OnEvent("/", game.ACTION_PLAYER_KICK, onKickEvent)
 	server.OnEvent("/", "notice", onEventNotice)
@@ -130,6 +131,27 @@ func onEventRoundContinue(s socket.Conn, msg string) string {
 
 	gp.Receive(p.PlayerName, game.ACTION_ROUND_CONTINUE, msg)
 	return fmt.Sprintf("MOD %s chose to continue the round!", p.PlayerName)
+}
+
+func onEventRemoveCard(s socket.Conn, msg string) string {
+	var p communication.JoinRequestAction = s.Context().(communication.JoinRequestAction)
+	log.Printf("Game %s (socket): received message that %s wants to remove a card!", p.GameCode, p.PlayerName)
+
+	gp, err := shelf.GlobalShelf.Play(p.GameCode)
+	if err != nil {
+		log.Printf("Game %s (socket): game not found, %s cannot remove a card!", p.GameCode, p.PlayerName)
+		return fmt.Sprintf("Game %s (socket): game not found, %s cannot remove a card!", p.GameCode, p.PlayerName)
+	}
+
+	var action communication.RemoveCardAction
+	err = json.Unmarshal([]byte(msg), &action)
+	if err != nil {
+		log.Printf("Game %s (socket): error while parsing remove card action: %s", p.GameCode, err)
+		return fmt.Sprintf("Game %s (socket): error while parsing remove card action: %s", p.GameCode, err)
+	}
+
+	gp.Receive(p.PlayerName, game.ACTION_CARD_REMOVE, action)
+	return fmt.Sprintf("Player %s removed a card!", p.PlayerName)
 }
 
 func onEventLeaveGame(s socket.Conn, msg string) string {
