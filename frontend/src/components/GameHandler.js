@@ -4,7 +4,6 @@ import { GameCard, CardColor, Player } from "./dataStructure";
 import ListPlayer from './ListPlayer'
 import ListCards from './cardDisplay/ListCards'
 import GameCardDisplay from "./cardDisplay/GameCardDisplay";
-import { Link } from "react-router-dom";
 import { Button } from "@mui/material";
 
 import { SocketContext } from "./socket";
@@ -37,6 +36,7 @@ class GameHandler extends Component {
         this.kickPlayer = this.kickPlayer.bind(this);
         this.clearGame = this.clearGame.bind(this);
         this.isPlayerType = this.isPlayerType.bind(this);
+        this.onCardDelete = this.onCardDelete.bind(this);
     }
 
     isPlayerType(f) {
@@ -85,6 +85,10 @@ class GameHandler extends Component {
 
     onCardSelection(c) {
         this.context.emit("entity.card.chosen", JSON.stringify({ cardId: c.id }))
+    }
+
+    onCardDelete(c) {
+        this.context.emit("player.card.remove", JSON.stringify({ cardId: c.id }))
     }
 
     leaveGame() {
@@ -162,17 +166,17 @@ class GameHandler extends Component {
                     {(this.state.actionState === "boss.choosing" || this.state.actionState === "mod.can.continue") &&
                         <div >
                             {(this.state.actionState === "boss.choosing" && this.isPlayerType(e => e.isBoss)) ?
-                                <ListCards cards={this.state.playedCards} onCardSelect={this.onCardSelection} />
+                                <ListCards cards={this.state.playedCards} onCardSelect={this.onCardSelection} onCardDelete={this.onCardDelete} />
                                 :
-                                <ListCards cards={this.state.playedCards} />}
+                                <ListCards cards={this.state.playedCards} onCardDelete={this.onCardDelete} />}
                         </div>}
                 </div>
                 <div className="gameHandler-whiteCards">
                     <h3>Your Cards:</h3>
                     {this.state.actionState === "player.choosing" && !this.isPlayerType(e => e.isBoss) ?
-                        <ListCards cards={this.state.whiteCards} onCardSelect={this.onCardSelection} />
+                        <ListCards cards={this.state.whiteCards} onCardSelect={this.onCardSelection} onCardDelete={this.onCardDelete} />
                         :
-                        <ListCards cards={this.state.whiteCards} />}
+                        <ListCards cards={this.state.whiteCards} onCardDelete={this.onCardDelete} />}
                 </div>
 
                 {(this.isPlayerType(e => e.isMod) && this.state.actionState === "game.ready") &&

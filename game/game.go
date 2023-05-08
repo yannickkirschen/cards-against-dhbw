@@ -15,6 +15,7 @@ const (
 	ACTION_GAME_START      = "game.start"         // MOD wants to start the game
 	ACTION_GAME_LEAVE      = "game.leave"         // Player wants to leave the game
 	ACTION_CARD_CHOSEN     = "entity.card.chosen" // Player has chosen a card (black or white)
+	ACTION_CARD_REMOVE     = "player.card.remove" // Player wants to exchange a card for a new one
 	ACTION_ROUND_CONTINUE  = "mod.round.continue" // MOD wants to continue the round
 	ACTION_PLAYER_INACTIVE = "player.inactive"    // Player is inactive
 	ACTION_PLAYER_KICK     = "player.kick"        // MOD wants to kick a player
@@ -112,6 +113,8 @@ func (g *Game) StateAllows(action string) bool {
 		return g.State == STATE_ROUND_FINISHED
 	case ACTION_PLAYER_KICK:
 		return true // players can always be kicked
+	case ACTION_CARD_REMOVE:
+		return g.State != STATE_GAME_LOBBY && g.State != STATE_GAME_READY && g.State != STATE_GAME_FINISHED
 	default:
 		return false
 	}

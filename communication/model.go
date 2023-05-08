@@ -15,8 +15,6 @@ type LobbyState struct {
 	GameReady bool                   `json:"gameReady"`
 }
 
-type StartGameAction struct{}
-
 type PlayerChoosingState struct {
 	Players    []*player.PublicPlayer `json:"players"`
 	BlackCard  *card.Card             `json:"blackCard"`
@@ -33,6 +31,10 @@ type BossHasChosenState struct {
 	Winner      string                 `json:"winner"`
 	WinnerCard  string                 `json:"winnerCard"`
 	PlayedCards []*card.Card           `json:"playedCards"`
+}
+
+type RemoveCardAction struct {
+	CardId string `json:"cardId"`
 }
 
 type PlayerKickAction struct {
