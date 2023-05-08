@@ -10,6 +10,7 @@ import { Button } from "@mui/material";
 import { SocketContext } from "./socket";
 import "./gameHandler.css"
 import withHistory from "./hocs";
+import GameInfo from "./GameInfo";
 
 class GameHandler extends Component {
 
@@ -48,14 +49,17 @@ class GameHandler extends Component {
             return false
         }
 
-        return filtered[0].id === localStorage.getItem("playerID")
+        return filtered[0].id === localStorage.getItem("playerName")
     }
 
     loadPlayer(src) {
         let p = []
         src.forEach(element => {
-            p.push(new Player(element.id, element.name, element.isMod, element.isBoss, element.points))
+            p.push(new Player(element.name, element.isMod, element.isBoss, element.points))
         });
+        if (p.filter(e => e.name === localStorage.getItem("playerName")).length != 1) {
+
+        }
         return p
     }
 
@@ -89,8 +93,8 @@ class GameHandler extends Component {
         this.props.navigate("/")
     }
 
-    kickPlayer(playerId) {
-        this.context.emit("player.kick", JSON.stringify({ playerID: playerId }))
+    kickPlayer(playerName) {
+        this.context.emit("player.kick", JSON.stringify({ playerName: playerName }))
     }
 
     clearGame(reason) {
@@ -98,28 +102,19 @@ class GameHandler extends Component {
         this.setState({ player: [], whiteCards: [], blackCard: null, playedCards: [], actionState: reason !== null ? reason : "" })
     }
 
-    componentWillUnmount() {
-        //this.leaveGame();
-    }
-
     componentDidMount() {
-        if (this.context.connected) {
-            this.context.emit("join", JSON.stringify({ gameID: localStorage.getItem("gameID"), playerID: localStorage.getItem("playerID") }))
-        }
-        if (!this.context.connected) {
-            // somehow this happens on page reload, but connection is
-            this.context.emit("join", JSON.stringify({ gameID: localStorage.getItem("gameID"), playerID: localStorage.getItem("playerID") }))
-        }
+        this.context.emit("join", JSON.stringify({ gameCode: localStorage.getItem("gameCode"), playerName: localStorage.getItem("playerName") }))
+
 
         this.context.on("reconnect", attempts => {
-            console.log("reconnected to server")
-            this.context.emit("join", JSON.stringify({ gameID: localStorage.getItem("gameID"), playerID: localStorage.getItem("playerID") }))
+            console.log("reconnected to server after " + attempts + " attempts")
+            this.context.emit("join", JSON.stringify({ gameCode: localStorage.getItem("gameCode"), playerName: localStorage.getItem("playerName") }))
         })
 
         this.context.on("invalidCodeState", data => {
             this.setState({ actionState: "invalidCode" })
-            localStorage.removeItem("gameID")
-            localStorage.removeItem("playerID")
+            localStorage.removeItem("gameCode")
+            localStorage.removeItem("playerName")
         })
 
         this.context.on("game.lobby", data => {
@@ -162,92 +157,61 @@ class GameHandler extends Component {
     }
 
     render() {
-        if (this.state.actionState !== "invalidCode") {
-            return (
-                <div className="gameHandler-container">
-                    <div className="gameHandler-infoArea">
-                        {(this.state.actionState === "game.joined") &&
-                            <h3>Waiting for others to join. GameID: {localStorage.getItem("gameID")}</h3>}
-                        {(this.state.actionState === "game.ready") &&
-                            <h3>Waiting for the MOD to start the game</h3>}
-                        {(this.state.actionState === "player.choosing" && this.isPlayerType(e => e.isBoss)) &&
-                            <h3>Waiting for the players to choose their cards.</h3>}
-                        {(this.state.actionState === "player.choosing" && !this.isPlayerType(e => e.isBoss)) &&
-                            <h3>Choose the card matching the black card best!</h3>}
-                        {(this.state.actionState === "boss.choosing" && this.isPlayerType(e => e.isBoss)) &&
-                            <h3>You are the boss! Choose the winning card!</h3>}
-                        {(this.state.actionState === "boss.choosing" && !this.isPlayerType(e => e.isBoss)) &&
-                            <h3>Waiting for the boss to choose the winning card</h3>}
-                        {(this.state.actionState === "mod.can.continue" && !this.isPlayerType(e => e.isMod)) &&
-                            <h3>Waiting for the MOD to continue</h3>}
-                        {(this.state.actionState === "mod.can.continue" && this.isPlayerType(e => e.isMod)) &&
-                            <h3>You are the MOD. Continue to the next round!</h3>}
-                        {(this.state.actionState === "game.finished") &&
-                            <h3>Game finished! {this.findWinner()} has won!</h3>}
-                        {(this.state.actionState === "game.abort") &&
-                            <h3>Game aborted. Return to home.</h3>}
-                        {this.state.actionState === "invalidCoe" &&
-                            <h3>Oops...something went wrong (or I did it again)</h3>}
-
-
-                    </div>
-                    <div className="gameHandler-blackCard">
-                        {this.state.blackCard !== null && <GameCardDisplay card={this.state.blackCard} />}
-                    </div>
-                    <div className="gameHandler-publicCards">
-                        <h3>Cards on the table:</h3>
-                        {(this.state.actionState === "boss.choosing" || this.state.actionState === "mod.can.continue") &&
-                            <div >
-                                {(this.state.actionState === "boss.choosing" && this.isPlayerType(e => e.isBoss)) ?
-                                    <ListCards cards={this.state.playedCards} onCardSelect={this.onCardSelection} />
-                                    :
-                                    <ListCards cards={this.state.playedCards} />}
-                            </div>}
-                    </div>
-                    <div className="gameHandler-whiteCards">
-                        <h3>Your Cards:</h3>
-                        {this.state.actionState === "player.choosing" && !this.isPlayerType(e => e.isBoss) ?
-                            <ListCards cards={this.state.whiteCards} onCardSelect={this.onCardSelection} />
-                            :
-                            <ListCards cards={this.state.whiteCards} />}
-                    </div>
-
-                    {(this.isPlayerType(e => e.isMod) && this.state.actionState === "game.ready") &&
-                        <Button variant="contained" color="secondary" onClick={() => this.context.emit("game.start", JSON.stringify({}))}>
-                            Start game
-                        </Button>}
-
-                    {(this.isPlayerType(e => e.isMod) && this.state.actionState === "mod.can.continue") &&
-                        <Button variant="contained" color="secondary" onClick={() => this.context.emit("mod.round.continue", JSON.stringify({}))}>
-                            Next Round
-                        </Button>}
-
-                    <div className="gameHandler-playerList">
-                        <h4>Player:</h4> <br />
-                        <div className="gameHandler-playerList-innerContainer">
-                            {this.isPlayerType(e => e.isMod) ? <ListPlayer player={this.state.player} /> : <ListPlayer player={this.state.player} kickHandler={this.kickPlayer} />}
-                        </div>
-                        <Button variant='contained' color="error" onClick={this.leaveGame}>Leave Game</Button>
-                    </div>
-                    <div className="gameHandler-devInfo">
-                        PlayerID: {localStorage.getItem("playerID")},
-                        GameID: {localStorage.getItem("gameID")},
-                        Action State: {this.state.actionState},
-                        IsMod: {this.isPlayerType(e => e.isMod) ? "yes" : "no"},
-                        IsBoss: {this.isPlayerType(e => e.isBoss) ? "yes" : "no"}
-                    </div>
+        return (
+            <div className="gameHandler-container">
+                <div className="gameHandler-infoArea">
+                    <GameInfo state={this.state.actionState} isPlayerType={this.isPlayerType} findWinner={this.findWinner} />
                 </div>
-            )
-        }
-        else {
-            return (
-                <>
-                    <h2>Connection to game server failed.</h2>
-                    <Link to="/">Home</Link>
-                </>
-            )
-        }
+                <div className="gameHandler-blackCard">
+                    {this.state.blackCard !== null && <GameCardDisplay card={this.state.blackCard} />}
+                </div>
+                <div className="gameHandler-publicCards">
+                    <h3>Cards on the table:</h3>
+                    {(this.state.actionState === "boss.choosing" || this.state.actionState === "mod.can.continue") &&
+                        <div >
+                            {(this.state.actionState === "boss.choosing" && this.isPlayerType(e => e.isBoss)) ?
+                                <ListCards cards={this.state.playedCards} onCardSelect={this.onCardSelection} />
+                                :
+                                <ListCards cards={this.state.playedCards} />}
+                        </div>}
+                </div>
+                <div className="gameHandler-whiteCards">
+                    <h3>Your Cards:</h3>
+                    {this.state.actionState === "player.choosing" && !this.isPlayerType(e => e.isBoss) ?
+                        <ListCards cards={this.state.whiteCards} onCardSelect={this.onCardSelection} />
+                        :
+                        <ListCards cards={this.state.whiteCards} />}
+                </div>
+
+                {(this.isPlayerType(e => e.isMod) && this.state.actionState === "game.ready") &&
+                    <Button variant="contained" color="secondary" onClick={() => this.context.emit("game.start", JSON.stringify({}))}>
+                        Start game
+                    </Button>}
+
+                {(this.isPlayerType(e => e.isMod) && this.state.actionState === "mod.can.continue") &&
+                    <Button variant="contained" color="secondary" onClick={() => this.context.emit("mod.round.continue", JSON.stringify({}))}>
+                        Next Round
+                    </Button>}
+
+                <div className="gameHandler-playerList">
+                    <h4>Player:</h4> <br />
+                    <div className="gameHandler-playerList-innerContainer">
+                        {!(this.isPlayerType(e => e.isMod)) ? <ListPlayer player={this.state.player} /> : <ListPlayer player={this.state.player} kickHandler={this.kickPlayer} />}
+                    </div>
+                    <Button variant='contained' color="error" onClick={this.leaveGame}>Leave Game</Button>
+                </div>
+                <div className="gameHandler-devInfo">
+                    playerName: {localStorage.getItem("playerName")},
+                    gameCode: {localStorage.getItem("gameCode")},
+                    Action State: {this.state.actionState},
+                    IsMod: {this.isPlayerType(e => e.isMod) ? "yes" : "no"},
+                    IsBoss: {this.isPlayerType(e => e.isBoss) ? "yes" : "no"}
+                </div>
+            </div>
+
+        )
     }
+
 }
 
 export default withHistory(GameHandler);
