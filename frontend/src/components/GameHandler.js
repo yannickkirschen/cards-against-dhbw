@@ -58,7 +58,7 @@ class GameHandler extends Component {
             p.push(new Player(element.name, element.isMod, element.isBoss, element.points))
         });
         if (p.filter(e => e.name === localStorage.getItem("playerName")).length != 1) {
-
+            this.leaveGame()
         }
         return p
     }
@@ -88,8 +88,8 @@ class GameHandler extends Component {
     }
 
     leaveGame() {
-        this.context.emit("game.leave", JSON.stringify({}));
-        this.clearGame("game.leave");
+        this.context.emit("game.leave", JSON.stringify({}))
+        localStorage.clear()
         this.props.navigate("/")
     }
 
@@ -103,7 +103,7 @@ class GameHandler extends Component {
     }
 
     componentDidMount() {
-        this.context.emit("join", JSON.stringify({ gameCode: localStorage.getItem("gameCode"), playerName: localStorage.getItem("playerName") }))
+        this.context.emit("game.join", JSON.stringify({ gameCode: localStorage.getItem("gameCode"), playerName: localStorage.getItem("playerName") }))
 
 
         this.context.on("reconnect", attempts => {
@@ -111,11 +111,6 @@ class GameHandler extends Component {
             this.context.emit("join", JSON.stringify({ gameCode: localStorage.getItem("gameCode"), playerName: localStorage.getItem("playerName") }))
         })
 
-        this.context.on("invalidCodeState", data => {
-            this.setState({ actionState: "invalidCode" })
-            localStorage.removeItem("gameCode")
-            localStorage.removeItem("playerName")
-        })
 
         this.context.on("game.lobby", data => {
             this.setState({ player: this.loadPlayer(data.players), actionState: data.gameReady ? "game.ready" : "game.joined" })
@@ -151,9 +146,6 @@ class GameHandler extends Component {
             localStorage.clear()
         })
 
-        this.context.on("game.abort", data => {
-            this.clearGame("game.abort")
-        })
     }
 
     render() {
