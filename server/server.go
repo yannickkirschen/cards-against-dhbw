@@ -13,6 +13,7 @@ import (
 	"github.com/googollee/go-socket.io/engineio/transport/polling"
 	"github.com/googollee/go-socket.io/engineio/transport/websocket"
 	"github.com/yannickkirschen/cards-against-dhbw/communication"
+	e "github.com/yannickkirschen/cards-against-dhbw/err"
 	"github.com/yannickkirschen/cards-against-dhbw/game"
 	"github.com/yannickkirschen/cards-against-dhbw/shelf"
 )
@@ -71,7 +72,11 @@ func onEventJoin(s socket.Conn, msg string) string {
 
 	err = gp.AddSender(p.PlayerName, &socketSender{f: s.Emit})
 	if err != nil {
-		// TODO: handle error
+		s.Emit("game.error", &communication.ApplicationError{
+			Label:   e.PLAYER_NOT_FOUND,
+			Payload: p.PlayerName,
+		})
+		return "player not found"
 	}
 
 	gp.Receive(p.PlayerName, game.ACTION_GAME_JOIN, msg)

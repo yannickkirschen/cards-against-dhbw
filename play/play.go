@@ -266,6 +266,6 @@ func (p *Play) sendError(playerName string, label string, payload any) {
 		Payload: payload,
 	}
 
-	p.senders[playerName].Send(game.STATE_ROUND_FINISHED, state)
+	p.senders[playerName].Send("game.error", state)
 	log.Printf("Sent error '%s' to player %s for game %s!", label, playerName, p.Game.Code)
 }
