@@ -12,7 +12,8 @@ import (
 // Holds the configuration
 type Config struct {
 	Database Database
-	Port     int `json:"port"`
+	Port     int    `json:"port"`
+	Static   string `json:"static"`
 }
 
 // Holds the database configuration

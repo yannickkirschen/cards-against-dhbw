@@ -4,5 +4,6 @@
         "password": "",
         "db": 0
     },
-    "port": 3333
+    "port": 3333,
+    "static": "./frontend/build"
 }
