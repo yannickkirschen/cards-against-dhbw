@@ -23,6 +23,9 @@ func main() {
 	data.GlobalClient = data.NewClient()
 	shelf.GlobalShelf = shelf.New()
 
+	fs := http.FileServer(http.Dir(config.DhbwConfig.Static))
+	http.Handle("/", fs)
+
 	http.HandleFunc("/v1/new", endpoint.NewGameHandler)
 	http.HandleFunc("/v1/join/", endpoint.JoinGameHandler)
 
