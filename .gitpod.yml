@@ -7,6 +7,7 @@ tasks:
 
 ports:
     - port: 3333
-      #onOpen:
+      onOpen: ignore
       name: Server
       description: Backend of Cards Against DHBW
+      visibility: public
