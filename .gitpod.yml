@@ -3,6 +3,10 @@ image: gitpod/workspace-full
 tasks:
     - name: Build server
       before: go mod download
+      init: |
+          cd frontend
+          npm run build
+          cd ..
       command: go run cmd/main.go
 
 ports:
