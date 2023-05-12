@@ -22,7 +22,8 @@ class GameHandler extends Component {
             whiteCards: [],
             playedCards: [],
             blackCard: null,
-            actionState: "invalidCoe",
+            actionState: "default",
+            msg: ""
             // action states are:
             //  invalidCode - link to home enabled
             //  playerChoosing - whiteCard buttons enabled
@@ -103,7 +104,7 @@ class GameHandler extends Component {
 
     clearGame(reason) {
         localStorage.clear();
-        this.setState({ player: [], whiteCards: [], blackCard: null, playedCards: [], actionState: reason !== null ? reason : "" })
+        this.setState({ player: [], whiteCards: [], blackCard: null, playedCards: [], actionState: "game.cleared", msg: reason !== null ? reason : "reason unknown" })
     }
 
     componentDidMount() {
@@ -144,10 +145,13 @@ class GameHandler extends Component {
             this.setState({ blackCard: b, player: this.loadPlayer(data.players), playedCards: cards, actionState: "mod.can.continue" })
         })
 
-
         this.context.on("game.finished", data => {
             this.setState({ player: this.loadPlayer(data.players), actionState: "game.finished" })
             localStorage.clear()
+        })
+
+        this.context.on("game.error", data => {
+            this.setState({ actionState: "game.error", msg: data.label + ": " + data.payload })
         })
 
     }
@@ -156,7 +160,7 @@ class GameHandler extends Component {
         return (
             <div className="gameHandler-container">
                 <div className="gameHandler-infoArea">
-                    <GameInfo state={this.state.actionState} isPlayerType={this.isPlayerType} findWinner={this.findWinner} />
+                    <GameInfo state={this.state} isPlayerType={this.isPlayerType} findWinner={this.findWinner} leaveGame={this.leaveGame} />
                 </div>
                 <div className="gameHandler-blackCard">
                     {this.state.blackCard !== null && <GameCardDisplay card={this.state.blackCard} />}
