@@ -1,4 +1,4 @@
-
+import { Button } from "@mui/material";
 
 
 const GameInfo = ({ state, isPlayerType, findWinner, leaveGame }) => {

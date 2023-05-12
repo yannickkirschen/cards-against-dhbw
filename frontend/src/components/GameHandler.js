@@ -56,7 +56,7 @@ class GameHandler extends Component {
     loadPlayer(src) {
         let p = []
         src.forEach(element => {
-            p.push(new Player(element.name, element.isMod, element.isBoss, element.points))
+            p.push(new Player(element.name, element.isMod, element.isBoss, element.points, element.active))
         });
         if (p.filter(e => e.name === localStorage.getItem("playerName")).length != 1) {
             this.leaveGame()

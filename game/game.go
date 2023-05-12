@@ -115,6 +115,8 @@ func (g *Game) StateAllows(action string) bool {
 		return true // players can always be kicked
 	case ACTION_CARD_REMOVE:
 		return g.State != STATE_GAME_LOBBY && g.State != STATE_GAME_READY && g.State != STATE_GAME_FINISHED
+	case ACTION_PLAYER_INACTIVE:
+		return true // players can always become inactive
 	default:
 		return false
 	}

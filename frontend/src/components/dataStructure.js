@@ -5,11 +5,12 @@ const CardColor = {
 }
 
 class Player {
-    constructor(name, isMod, isBoss, points) {
+    constructor(name, isMod, isBoss, points, active) {
         this.name = name
         this.isMod = isMod
         this.isBoss = isBoss
         this.points = points
+        this.active = active
     }
 }
 
