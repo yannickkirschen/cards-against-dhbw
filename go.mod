@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/googollee/go-socket.io v1.7.0
-	github.com/redis/go-redis/v9 v9.0.4
+	github.com/redis/go-redis/v9 v9.0.5
 )
 
 require (
