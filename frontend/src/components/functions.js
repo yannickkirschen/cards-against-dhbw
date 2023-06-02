@@ -1,6 +1,6 @@
 
 const newGame = async (gamerName, navigate) => {
-    fetch("http://localhost:3333/v1/new?name=" + gamerName)
+    fetch("/v1/new?name=" + gamerName)
         .then(res => res.json())
         .then(data => {
             console.log("data: " + JSON.stringify(data))
@@ -20,7 +20,7 @@ const newGame = async (gamerName, navigate) => {
 }
 
 const joinGame = async (gameCode, gamerName, navigate) => {
-    fetch("http://localhost:3333/v1/join/" + gameCode + "?name=" + gamerName)
+    fetch("/v1/join/" + gameCode + "?name=" + gamerName)
         .then(res => res.json())
         .then(data => {
             localStorage.setItem("gameCode", data.gameCode)

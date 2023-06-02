@@ -7,6 +7,8 @@
 
 This project is part of the lecture *Web Engineering 2* and is a clone of the popular card game *Cards against Humanity*.
 
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/yannickkirschen/cards-against-dhbw/tree/gitpod)
+
 ## Developers
 
 - [Rex2002](https://github.com/Rex2002)
