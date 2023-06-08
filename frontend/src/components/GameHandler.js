@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { GameCard, CardColor, Player } from "./dataStructure";
+import ErrorSnackbar from "./ErrorSnackbar";
 
 import ListPlayer from './ListPlayer'
 import ListCards from './cardDisplay/ListCards'
@@ -23,13 +24,8 @@ class GameHandler extends Component {
             playedCards: [],
             blackCard: null,
             actionState: "default",
+            showError: false,
             msg: ""
-            // action states are:
-            //  invalidCode - link to home enabled
-            //  playerChoosing - whiteCard buttons enabled
-            //  bossChoosing - whiteCard buttons enabled
-            //  gameWaiting - startGame button enabled
-            //  none
         }
         this.onCardSelection = this.onCardSelection.bind(this);
         this.leaveGame = this.leaveGame.bind(this);
@@ -118,6 +114,7 @@ class GameHandler extends Component {
 
 
         this.context.on("game.lobby", data => {
+
             this.setState({ player: this.loadPlayer(data.players), actionState: data.gameReady ? "game.ready" : "game.joined" })
         })
 
@@ -194,7 +191,8 @@ class GameHandler extends Component {
                     </Button>}
 
                 <div className="gameHandler-playerList">
-                    <h4>Player:</h4> <br />
+
+                    <h4>GameID: {localStorage.getItem("gameCode")} <br /> <br /> Player:</h4> <br /> <br />
                     <div className="gameHandler-playerList-innerContainer">
                         {!(this.isPlayerType(e => e.isMod)) ? <ListPlayer player={this.state.player} /> : <ListPlayer player={this.state.player} kickHandler={this.kickPlayer} />}
                     </div>
@@ -207,6 +205,7 @@ class GameHandler extends Component {
                     IsMod: {this.isPlayerType(e => e.isMod) ? "yes" : "no"},
                     IsBoss: {this.isPlayerType(e => e.isBoss) ? "yes" : "no"}
                 </div>
+                <ErrorSnackbar msg={this.state.msg} open={this.state.showError} setOpen={(val) => this.setState({ showError: val })} />
             </div>
 
         )
