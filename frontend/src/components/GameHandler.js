@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { GameCard, CardColor, Player } from "./dataStructure";
+import ErrorSnackbar from "./ErrorSnackbar";
 
 import ListPlayer from './ListPlayer'
 import ListCards from './cardDisplay/ListCards'
@@ -22,13 +23,9 @@ class GameHandler extends Component {
             whiteCards: [],
             playedCards: [],
             blackCard: null,
-            actionState: "invalidCoe",
-            // action states are:
-            //  invalidCode - link to home enabled
-            //  playerChoosing - whiteCard buttons enabled
-            //  bossChoosing - whiteCard buttons enabled
-            //  gameWaiting - startGame button enabled
-            //  none
+            actionState: "default",
+            showError: false,
+            msg: ""
         }
         this.onCardSelection = this.onCardSelection.bind(this);
         this.leaveGame = this.leaveGame.bind(this);
@@ -55,7 +52,7 @@ class GameHandler extends Component {
     loadPlayer(src) {
         let p = []
         src.forEach(element => {
-            p.push(new Player(element.name, element.isMod, element.isBoss, element.points))
+            p.push(new Player(element.name, element.isMod, element.isBoss, element.points, element.active))
         });
         if (p.filter(e => e.name === localStorage.getItem("playerName")).length != 1) {
             this.leaveGame()
@@ -103,7 +100,7 @@ class GameHandler extends Component {
 
     clearGame(reason) {
         localStorage.clear();
-        this.setState({ player: [], whiteCards: [], blackCard: null, playedCards: [], actionState: reason !== null ? reason : "" })
+        this.setState({ player: [], whiteCards: [], blackCard: null, playedCards: [], actionState: "game.cleared", msg: reason !== null ? reason : "reason unknown" })
     }
 
     componentDidMount() {
@@ -117,6 +114,7 @@ class GameHandler extends Component {
 
 
         this.context.on("game.lobby", data => {
+
             this.setState({ player: this.loadPlayer(data.players), actionState: data.gameReady ? "game.ready" : "game.joined" })
         })
 
@@ -144,10 +142,13 @@ class GameHandler extends Component {
             this.setState({ blackCard: b, player: this.loadPlayer(data.players), playedCards: cards, actionState: "mod.can.continue" })
         })
 
-
         this.context.on("game.finished", data => {
             this.setState({ player: this.loadPlayer(data.players), actionState: "game.finished" })
             localStorage.clear()
+        })
+
+        this.context.on("game.error", data => {
+            this.setState({ actionState: "game.error", msg: data.label + ": " + data.payload })
         })
 
     }
@@ -156,7 +157,7 @@ class GameHandler extends Component {
         return (
             <div className="gameHandler-container">
                 <div className="gameHandler-infoArea">
-                    <GameInfo state={this.state.actionState} isPlayerType={this.isPlayerType} findWinner={this.findWinner} />
+                    <GameInfo state={this.state} isPlayerType={this.isPlayerType} findWinner={this.findWinner} leaveGame={this.leaveGame} />
                 </div>
                 <div className="gameHandler-blackCard">
                     {this.state.blackCard !== null && <GameCardDisplay card={this.state.blackCard} />}
@@ -190,7 +191,8 @@ class GameHandler extends Component {
                     </Button>}
 
                 <div className="gameHandler-playerList">
-                    <h4>Player:</h4> <br />
+
+                    <h4>GameID: {localStorage.getItem("gameCode")} <br /> <br /> Player:</h4> <br /> <br />
                     <div className="gameHandler-playerList-innerContainer">
                         {!(this.isPlayerType(e => e.isMod)) ? <ListPlayer player={this.state.player} /> : <ListPlayer player={this.state.player} kickHandler={this.kickPlayer} />}
                     </div>
@@ -203,6 +205,7 @@ class GameHandler extends Component {
                     IsMod: {this.isPlayerType(e => e.isMod) ? "yes" : "no"},
                     IsBoss: {this.isPlayerType(e => e.isBoss) ? "yes" : "no"}
                 </div>
+                <ErrorSnackbar msg={this.state.msg} open={this.state.showError} setOpen={(val) => this.setState({ showError: val })} />
             </div>
 
         )
