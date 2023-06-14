@@ -1,18 +1,21 @@
-image: gitpod/workspace-full
+image:
+    file: .gitpod.Dockerfile
 
 tasks:
-  - name: Build server
-    before: go mod download
-    init: |
-      cd frontend
-      npm install
-      npm run build
-      cd ..
-    command: go run cmd/main.go
+    - name: Build server
+      before: go mod download
+      init: |
+          cd frontend
+          npm install
+          npm run build
+          cd ..
+      command: |
+          redis-server
+          go run cmd/main.go
 
 ports:
-  - port: 3333
-    onOpen: notify
-    name: Server
-    description: Backend of Cards Against DHBW
-    visibility: public
+    - port: 3333
+      onOpen: notify
+      name: Server
+      description: Backend of Cards Against DHBW
+      visibility: public
