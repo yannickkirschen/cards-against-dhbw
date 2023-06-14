@@ -4,6 +4,7 @@ import GameHandler from './components/GameHandler';
 import './App.css';
 import { socket, SocketContext } from './components/socket';
 import Header from './components/header/Header';
+import HelpPage from './components/help/Help';
 
 function App() {
     return (
@@ -13,6 +14,7 @@ function App() {
                 <div className='app-body'>
                     <Routes>
                         <Route path="/game" element={<GameHandler />} />
+                        <Route path="/help" element={<HelpPage />} />
                         <Route path="/:id?" element={<Home />} />
 
                     </Routes>

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import HomeIcon from '@mui/icons-material/Home';
+import HelpIcon from '@mui/icons-material/Help';
 import "./header.css"
 import { IconButton } from "@mui/material";
 
@@ -14,9 +15,9 @@ function Header() {
                 <div className='header-text'>
                     Cards Against DHBW
                 </div>
-                <div className="App-header-placeholder">
-
-                </div>
+                <IconButton className="helpIcon-button" sx={{ borderRadius: "5px" }} onClick={() => navigate("/help")}>
+                    <HelpIcon color="secondary" sx={{ fontSize: 50 }} className="helpIcon-icon" />
+                </IconButton>
 
             </header>
         </div>
