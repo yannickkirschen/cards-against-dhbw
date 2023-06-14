@@ -2,6 +2,8 @@ image:
     file: .gitpod.Dockerfile
 
 tasks:
+    - name: Start redis
+      command: redis-server
     - name: Build server
       before: go mod download
       init: |
@@ -9,9 +11,7 @@ tasks:
           npm install
           npm run build
           cd ..
-      command: |
-          redis-server
-          go run cmd/main.go
+      command: go run cmd/main.go
 
 ports:
     - port: 3333
