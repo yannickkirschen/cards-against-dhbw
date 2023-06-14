@@ -3,6 +3,7 @@
 [![Lint commit message](https://github.com/yannickkirschen/cards-against-dhbw/actions/workflows/commit-lint.yml/badge.svg)](https://github.com/yannickkirschen/cards-against-dhbw/actions/workflows/commit-lint.yml)
 [![Go Workflow](https://github.com/yannickkirschen/cards-against-dhbw/actions/workflows/go.yml/badge.svg)](https://github.com/yannickkirschen/cards-against-dhbw/actions/workflows/go.yml)
 [![NPM Workflow](https://github.com/yannickkirschen/cards-against-dhbw/actions/workflows/npm.yml/badge.svg)](https://github.com/yannickkirschen/cards-against-dhbw/actions/workflows/npm.yml)
+[![Python Workflow](https://github.com/yannickkirschen/cards-against-dhbw/actions/workflows/python.yml/badge.svg)](https://github.com/yannickkirschen/cards-against-dhbw/actions/workflows/python.yml)
 [![GitHub release](https://img.shields.io/github/release/yannickkirschen/cards-against-dhbw.svg)](https://github.com/yannickkirschen/cards-against-dhbw/releases/)
 
 This project is part of the lecture *Web Engineering 2* and is a clone of the popular card game *Cards against Humanity*.
