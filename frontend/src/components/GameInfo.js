@@ -1,6 +1,11 @@
 import { Button } from "@mui/material";
 
 
+/**
+ * Component to display the current state of the game in a readable form based on the state.
+ * @param {Object} props contain the state, player type, methods to determine the winner and method to leave game
+ * @returns an <h3>-element containing readable information about the current state of the game
+ */
 const GameInfo = ({ state, isPlayerType, findWinner, leaveGame }) => {
     return (
         <>

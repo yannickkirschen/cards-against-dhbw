@@ -1,3 +1,8 @@
+/**
+ * provides classes to hold data about card and players.
+ */
+
+
 const CardColor = {
     BLACK: "black",
     WHITE: "white",
