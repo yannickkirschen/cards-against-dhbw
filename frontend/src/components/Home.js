@@ -6,7 +6,11 @@ import { newGame, joinGame } from './functions'
 
 import './Home.css'
 
-
+/**
+ * Component that is shown at the beginning.
+ * offers inputs for the player to either join a game or create a new one
+ * @returns component that contains the home-view
+ */
 const Home = () => {
     const navigate = useNavigate();
     const urlID = useParams().id;

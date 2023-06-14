@@ -26,12 +26,12 @@
     text-align: center;
 }
 
-.App-header-placeholder {
+.helpIcon-button {
     width: 10%;
     border-radius: 5px;
 }
 
-.searchIcon-button:hover {
+.helpIcon-button:hover {
     background-color: lightblue !important;
     border-radius: 5px;
 }
