@@ -1,127 +1,357 @@
 [
     {
-        "id": "f1b6d328c6f92e05d4de67addc8e7d4d",
-        "text": "Hofi",
-        "type": 1
+        "id": "794a58a4a8f5dfaea54b22c4168fed24",
+        "text": "Das Beste am Mensa-Essen ist _",
+        "type": 0
     },
     {
-        "id": "7bb5e0d60a9aeb5694a34d56de324a8f",
+        "id": "8197f2d809c3d550f42f3356d16c32f4",
+        "text": "Im nachhinein habe ich so meine Zweifel \u00fcber _",
+        "type": 0
+    },
+    {
+        "id": "a408861f74028a975bdfb1cccd3b002e",
+        "text": "Prof. xx, k\u00f6nnen Sie sagen, ob _ in der Klausur drankommt?",
+        "type": 0
+    },
+    {
+        "id": "5c062d4a36c76647499694583422abc0",
+        "text": "Das beste Date meines Lebens war(en)  _",
+        "type": 0
+    },
+    {
+        "id": "cb2d003bb54d80bbf7b9c74f770a4139",
+        "text": "Als Gott die DHBW erschuf, achtete Er auf Exzellenz und _",
+        "type": 0
+    },
+    {
+        "id": "7d112492f7f20f8843d25bd335b54855",
+        "text": "Ich studiere an der DHBW, weil _ mir Freude bereitet.",
+        "type": 0
+    },
+    {
+        "id": "a415dc896d6b8053e728bb38a6fc6706",
+        "text": "Was hilft Angela Merkel beim Entspannen?",
+        "type": 0
+    },
+    {
+        "id": "c1a5946918efd400eded5147c01b27e0",
+        "text": "Meine gro\u00dfe Liebe: _",
+        "type": 0
+    },
+    {
+        "id": "b52e12d2a57b7d3e6071665f1076dba0",
+        "text": "Der Duale Student braucht keinen Urlaub, er hat ja schon _",
+        "type": 0
+    },
+    {
+        "id": "43f0b66bf98f0a8e94a2a6e30d25ab73",
+        "text": "DHBW Late Night erreichte seinen Durchbruch mit der Folge \u00fcber _",
+        "type": 0
+    },
+    {
+        "id": "e14a39f922601ac7cbbf25778827e003",
+        "text": "Der Winf liebt Networking, Aktien und _",
+        "type": 0
+    },
+    {
+        "id": "35d13f5d207ee19bec261bba211a07b9",
+        "text": "Machen Sie mal eine Daumengeste zu _",
+        "type": 0
+    },
+    {
+        "id": "8361d156f29dae6cd90a8e7dbc5870f0",
+        "text": "\u201c_ ist kein Partizip.\u201d - Runge",
+        "type": 0
+    },
+    {
+        "id": "74b7632e220dc9017182d811aa30e62e",
+        "text": "\u201c_ will be dead in a few years anyway\u201d - Foerster",
+        "type": 0
+    },
+    {
+        "id": "8485229ac80f3b9fdfddee4a957d3986",
+        "text": "\u201cAls deutsch sprechender wei\u00dfer Mann musste ich im Ausland schon _ erleiden.\u201d - Foerster",
+        "type": 0
+    },
+    {
+        "id": "9f4a4c58fedb60f9165277245aa5c93f",
+        "text": "Das wichtigste Learning aus Projektmanagement war: _",
+        "type": 0
+    },
+    {
+        "id": "b1e94d32b48088833a1ae98d705b7f78",
+        "text": "\u201cWer das Java Whitepaper liest, denkt man k\u00f6nnte damit alles machen au\u00dfer _\u201d - Hofi",
+        "type": 0
+    },
+    {
+        "id": "6a2ed8eb09ce7c0f928ae4d2ef26e461",
+        "text": "\u201c_ da braucht man psychologische Betreuung\u201d - Martin",
+        "type": 0
+    },
+    {
+        "id": "34941cea3cf2c15be319f385bf0b812a",
+        "text": "\u201cSie k\u00f6nnen sich ja _ zum Ramadan schenken lassen\u201d - Hower",
+        "type": 0
+    },
+    {
+        "id": "60ba60cb67562dd1e4f685414e6bba13",
+        "text": "Die neue Autobiografie von E. Kruse: \u201c_ - Mein Leben an der DHBW\u201d",
+        "type": 0
+    },
+    {
+        "id": "bd1d080b3d438e6f5d182b27e7941c81",
         "text": "Was hebt die Stimmung in jeder Vorlesung?",
         "type": 0
     },
     {
-        "id": "ec176b8dc773b71f1e3f74c788e19228",
-        "text": "Die ewige Baustelle am Campus",
-        "type": 1
-    },
-    {
-        "id": "74c76e44e50a9e9aee0f3059550b8d01",
-        "text": "Der berüchtigte Mathe-Prof",
-        "type": 1
-    },
-    {
-        "id": "d76bfce29a7fa40d6a2667276f45530c",
-        "text": "Die Kampagne für mehr Toilettenpapier",
+        "id": "40a2aa888e29847d65af5b55950da7bb",
+        "text": "Das Einzige, was schlimmer ist als eine Java-Vorlesung am Freitag, ist _",
         "type": 0
     },
     {
-        "id": "c3e2b4c5e5d5b5c5aa5fcaaf5c4ad4a1",
-        "text": "Die Suche nach einem freien Parkplatz",
+        "id": "9668c3adea2cab949045073b1615dbdc",
+        "text": "\u201cDa werden Sie \u00f6fters im Job dr\u00fcber stolpern, dass Sie wissen m\u00fcssen, was _ ist\u201d - DB",
+        "type": 0
+    },
+    {
+        "id": "eaff8bd5d7dbbaa3bb898ac6368749d6",
+        "text": "Wirtschaften ist der sorgsame Umgang mit _",
+        "type": 0
+    },
+    {
+        "id": "9ae8dedd1d74ef74195db1a3743c388c",
+        "text": "Hofi",
         "type": 1
     },
     {
-        "id": "6e12db84c72a6bfedc6e8e7b37a924ef",
-        "text": "Der Versuch, eine Antwort auf die Frage 'Was ist Duales Studium?' zu finden",
+        "id": "2042101ac1f6e7741bfe43f3672e6d7c",
+        "text": "Thomas",
         "type": 1
     },
     {
-        "id": "e277f3709a9ecbeab68e1008df1d34dd",
-        "text": "Das Ende der Mensa-Schlange",
+        "id": "81588ed9a5e2b8d38e9b4540d6cc0145",
+        "text": "Maxis PowerPoint-Skills",
         "type": 1
     },
     {
-        "id": "1f9daa6b8192e50b5c5b2f5cb5f5bc5b",
-        "text": "Die Vorlesung, bei der der Prof nur seinen Laptopbildschirm zeigt",
+        "id": "32508a8b3cedfda76d406acf337a96c1",
+        "text": "das Studium an der DHBW",
         "type": 1
     },
     {
-        "id": "0dd0f4151986ba8d0b37c4733c86a9e5",
-        "text": "Das Warten auf eine Antwort vom Studienbüro",
+        "id": "3da2b1baebfcbd630b0ef8e39f1e1afd",
+        "text": "das Studienb\u00fcro",
         "type": 1
     },
     {
-        "id": "e3a90571d3b3b76fae02c1c25d83f605",
-        "text": "Die ungeschriebene Regel, dass man im Fahrstuhl nicht redet",
+        "id": "48dcad4769d646b6de1dcf96d6b4f570",
+        "text": "die ungl\u00fccklichen \u00dcberschneidungen von Martin",
         "type": 1
     },
     {
-        "id": "88923655e2f39a77aebcc32a1cc8fca6",
-        "text": "Die Vorlesung, bei der man sich wünscht, man hätte Kaffee getrunken",
+        "id": "568cd9e8439d4b77204a7b477ec2c018",
+        "text": "JavaTX",
         "type": 1
     },
     {
-        "id": "ca0f1e11c35b06d18765c40af9e9b3e7",
-        "text": "Die einzige Möglichkeit, einen Parkplatz an der DHBW zu finden, ist ...",
+        "id": "0852002f569d9c48b8463802daa0a880",
+        "text": "die Java-Vorlesung",
         "type": 1
     },
     {
-        "id": "31f648c64d7d0daa1b7ca9a9a38d7a31",
-        "text": "Das Einzige, was schlimmer ist als eine Vorlesung am Freitag, ist ...",
+        "id": "1f9f9a875a20cfc102d418d83369ed2d",
+        "text": "wenig Schlaf und Depression",
         "type": 1
     },
     {
-        "id": "ed5e5ebd3f3038a6fa9f6b952ec6b80a",
-        "text": "Das Studienbüro hat beschlossen, dass ab sofort ... verboten ist.",
+        "id": "43e350618ec951e034f0981cbb36d038",
+        "text": "Stress",
         "type": 1
     },
     {
-        "id": "b1d07b165067a9aa9ecb7a0a23441aeb",
-        "text": "Die einzige Erklärung für die DHBW-Mensa ist ...",
+        "id": "23f94e386decaf2855aeea663649e3b6",
+        "text": "offene Decken",
         "type": 1
     },
     {
-        "id": "6b5af3d5f5c5e5c5f5ca5c5b5c6b0f39",
-        "text": "Die besten Partys an der DHBW finden statt ...",
+        "id": "1ddf4950929c68b060f8efbb1993f605",
+        "text": "wenig Kommunikation und schlechte Planung",
         "type": 1
     },
     {
-        "id": "4ec4a913e96a4c617e99e365d9a9a874",
-        "text": "Was verursacht jedes Mal ein kollektives Aufstöhnen in der Vorlesung?",
+        "id": "1eb93d16c9137ebee47e00192ee96d55",
+        "text": "viele Winfs",
         "type": 1
     },
     {
-        "id": "d3f59cf62f70db46e54e38d119c9eefd",
-        "text": "Das Geheimnis des Erfolgs an der DHBW ist ...",
+        "id": "9d016b8bfd0e45501302134f2676e111",
+        "text": "Stroetis Schachclub",
         "type": 1
     },
     {
-        "id": "107b98a729d707714f661536bcfe1ce5",
-        "text": "Was ist der Grund, dass du deinen Stundenplan nie verstehen wirst?",
+        "id": "a38ae7b4f5166f21cb4abf0d3b6f2ec2",
+        "text": "Kapitalismus",
         "type": 1
     },
     {
-        "id": "e7d4910b73ccad7a05bda294d695c5e5",
-        "text": "Das Schlimmste an der DHBW ist ...",
+        "id": "f15353a3e6de72c08de20395bd7ef0da",
+        "text": "Kommunismus",
         "type": 1
     },
     {
-        "id": "a8d6e28e9c9deed39224d206f1ba60d3",
-        "text": "Das neue Fach im Studiengang XYZ ist ...",
+        "id": "9b140873f2402b0ac8f5df943ba0039d",
+        "text": "der Geist in der Materie",
         "type": 1
     },
     {
-        "id": "d3ec50c0c46db0906f880a9ce9ab2cf1",
-        "text": "Das Beste an der DHBW ist ...",
+        "id": "5b74d8e45ff633a2412fe5f73b2f13fb",
+        "text": "Ballerburg",
         "type": 1
     },
     {
-        "id": "31f648c7538vd0daa1b7ca9a9a38d7a31",
-        "text": "Das Einzige, was schlimmer ist als eine Vorlesung am Freitag, ist ...",
+        "id": "d6bec55276f28fd45c46636759662cbf",
+        "text": "die naive L\u00f6sung",
         "type": 1
     },
     {
-        "id": "31f6445dbcd7d0daa1b7ca9a9a38d7a31",
-        "text": "Das Einzige, was schlimmer ist als eine Vorlesung am Freitag, ist ...",
+        "id": "fdce48ad461c5c95eba72557eddd3cc6",
+        "text": "triviale L\u00f6sungen",
+        "type": 1
+    },
+    {
+        "id": "d2130425d0b172efabceca332318e1bf",
+        "text": "genaues mathematisches Hinsehen und eine einfach Polynomdivision im Kopf",
+        "type": 1
+    },
+    {
+        "id": "182f11a5f9eb682852f45bf092474ac5",
+        "text": "Verm\u00f6gensmehrung",
+        "type": 1
+    },
+    {
+        "id": "2438bb3f85553fc59d65f449d77a0bc7",
+        "text": "HashMaps",
+        "type": 1
+    },
+    {
+        "id": "f5e265d607cb720058fc166e00083fe8",
+        "text": "Rust",
+        "type": 1
+    },
+    {
+        "id": "a7f5f35426b927411fc9231b56382173",
+        "text": "Python",
+        "type": 1
+    },
+    {
+        "id": "edc9f0a5a5d57797bf68e37364743831",
+        "text": "Linux",
+        "type": 1
+    },
+    {
+        "id": "a5fa5746370b608090b994a97b49e98b",
+        "text": "Networking",
+        "type": 1
+    },
+    {
+        "id": "c9b1c6d0eea1e4d47fc3c8d15ed6e0a8",
+        "text": "mit jedem Prof auf LinkedIn vernetzt sein",
+        "type": 1
+    },
+    {
+        "id": "b03196449cc3b560f2cbaeded4e66b4a",
+        "text": "Nicken ohne die Frage abzuwarten",
+        "type": 1
+    },
+    {
+        "id": "138725eef53b4e232b7bd45a7324624f",
+        "text": "eine App, die Fame hat",
+        "type": 1
+    },
+    {
+        "id": "501a494eaa4e6771c5f0f25b25c77326",
+        "text": "die Kernfrage",
+        "type": 1
+    },
+    {
+        "id": "a124d5dc2f0eaefbe98a11550b1ea0aa",
+        "text": "Schwinns Baukl\u00f6tze",
+        "type": 1
+    },
+    {
+        "id": "654826c0003c5758a3113b2931da928f",
+        "text": "SetlX",
+        "type": 1
+    },
+    {
+        "id": "c966a6c6007333a3caa0d841377c554e",
+        "text": "Lob von Runge",
+        "type": 1
+    },
+    {
+        "id": "78fc6c273ad1bf8e0d0d9c31863c427e",
+        "text": "gro\u00dfe Zahlen",
+        "type": 1
+    },
+    {
+        "id": "5e9f16ad307181bb33205ac9aca4d69a",
+        "text": "Der Spermabus",
+        "type": 1
+    },
+    {
+        "id": "654729161356952bbe244b053018715a",
+        "text": "Hofis Urlaubszeiten",
+        "type": 1
+    },
+    {
+        "id": "06e73132079e4a4f6da82d008aadec30",
+        "text": "Informatik-Bausteine - das Buch",
+        "type": 1
+    },
+    {
+        "id": "744c3615622a3490cdf7fb7b86918aa6",
+        "text": "deinen Prof zu googeln und nur Geister zu finden",
+        "type": 1
+    },
+    {
+        "id": "70ba66505ab0b2a24af8855429532f0f",
+        "text": "Gewinnmaximierung",
+        "type": 1
+    },
+    {
+        "id": "b2bddf8bfad740bcebe76b9f6d35f3f2",
+        "text": "deine Mudda",
+        "type": 1
+    },
+    {
+        "id": "247f333776feb7a931936ae794c5c235",
+        "text": "der Nervigste im Kurs",
+        "type": 1
+    },
+    {
+        "id": "dd5c258f49caf14a390ade3a6190058a",
+        "text": "Das m\u00fcssen Sie wissen!",
+        "type": 1
+    },
+    {
+        "id": "3efa6f48574bb6fa2ca2ab306f4bfb41",
+        "text": "BWLer",
+        "type": 1
+    },
+    {
+        "id": "f49594e489277ada6d5b12710088b20c",
+        "text": "Stimmen Sie mir zu?",
+        "type": 1
+    },
+    {
+        "id": "957381e97f96fdf165f96f28aae16ae3",
+        "text": "die 3. Dimension",
+        "type": 1
+    },
+    {
+        "id": "e096a3960c34e82da07ad0ba178855f4",
+        "text": "ganz genie\u00dfbar",
         "type": 1
     }
 ]
