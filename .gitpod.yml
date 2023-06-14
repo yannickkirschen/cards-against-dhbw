@@ -19,3 +19,8 @@ ports:
       name: Server
       description: Backend of Cards Against DHBW
       visibility: public
+    - port: 6379
+      onOpen: notify
+      name: redis
+      description: redis server for Cards Against DHBW
+      visibility: private
