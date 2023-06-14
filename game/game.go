@@ -30,7 +30,7 @@ const (
 	STATE_GAME_FINISHED    = "game.finished"   // Game is over (one player has 10 points)
 	STATE_INVALID          = "invalid"         // Invalid state
 
-	MAX_POINTS = 10
+	MAX_POINTS = 5
 )
 
 type Game struct {
