@@ -109,7 +109,7 @@ class GameHandler extends Component {
 
         this.context.on("reconnect", attempts => {
             console.log("reconnected to server after " + attempts + " attempts")
-            this.context.emit("join", JSON.stringify({ gameCode: localStorage.getItem("gameCode"), playerName: localStorage.getItem("playerName") }))
+            this.context.emit("game.rejoin", JSON.stringify({ gameCode: localStorage.getItem("gameCode"), playerName: localStorage.getItem("playerName") }))
         })
 
 

@@ -42,6 +42,7 @@ func InitServerSession() *socket.Server {
 	server.OnEvent("/", game.ACTION_CARD_REMOVE, onEventRemoveCard)
 	server.OnEvent("/", game.ACTION_GAME_LEAVE, onEventLeaveGame)
 	server.OnEvent("/", game.ACTION_PLAYER_KICK, onKickEvent)
+	server.OnEvent("/", game.ACTION_GAME_REJOIN, onEventRejoin)
 	server.OnEvent("/", "notice", onEventNotice)
 	server.OnError("/", onError)
 	server.OnDisconnect("/", onDisconnect)
@@ -82,6 +83,31 @@ func onEventJoin(s socket.Conn, msg string) string {
 
 	gp.Receive(p.PlayerName, game.ACTION_GAME_JOIN, msg)
 	return fmt.Sprintf("Player %s joined the game!", p.PlayerName)
+}
+
+func onEventRejoin(s socket.Conn, msg string) string {
+	var p communication.JoinRequestAction
+	json.Unmarshal([]byte(msg), &p)
+	s.SetContext(p)
+
+	log.Printf("Game %s: received message from player %s to rejoin the game!", p.GameCode, p.PlayerName)
+
+	gp, err := shelf.GlobalShelf.Play(p.GameCode)
+	if err != nil {
+		log.Printf("Game %s (socket): game not found, player %s cannot rejoin the game!", p.GameCode, p.PlayerName)
+		return fmt.Sprintf("Game %s (socket): game not found, player %s cannot rejoin the game!", p.GameCode, p.PlayerName)
+	}
+
+	err = gp.AddSender(p.PlayerName, &socketSender{f: s.Emit})
+	if err != nil {
+		s.Emit("game.error", &communication.ApplicationError{
+			Label:   e.PLAYER_NOT_FOUND,
+			Payload: p.PlayerName,
+		})
+		return "player not found"
+	}
+
+	return fmt.Sprintf("Player %s rejoined the game!", p.PlayerName)
 }
 
 func onEventGameStart(s socket.Conn, msg string) string {
