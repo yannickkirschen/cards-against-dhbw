@@ -12,6 +12,7 @@ import (
 
 const (
 	ACTION_GAME_JOIN       = "game.join"          // Player wants to join the game
+	ACTION_GAME_REJOIN     = "game.rejoin"        // Player wants to rejoin the game
 	ACTION_GAME_START      = "game.start"         // MOD wants to start the game
 	ACTION_GAME_LEAVE      = "game.leave"         // Player wants to leave the game
 	ACTION_CARD_CHOSEN     = "entity.card.chosen" // Player has chosen a card (black or white)
