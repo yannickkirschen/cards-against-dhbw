@@ -140,6 +140,21 @@
         "type": 0
     },
     {
+        "id": "c89209a89ed24df2ca20fd8f1722046c",
+        "text": "_ ist eine Wissenschaft.",
+        "type": 0
+    },
+    {
+        "id": "81896b69943f7545c1059490784e34ee",
+        "text": "Das sch\u00f6nste am E-Business ist E-_.",
+        "type": 0
+    },
+    {
+        "id": "27612a80eccc7e9a99ca31f19fce4f8a",
+        "text": "Das erste Einstellungskriterium der DHBW ist _.",
+        "type": 0
+    },
+    {
         "id": "9ae8dedd1d74ef74195db1a3743c388c",
         "text": "Hofi",
         "type": 1
@@ -392,6 +407,36 @@
     {
         "id": "f2ecf4050b36345ed454e50a6c41f7ee",
         "text": "Moodle",
+        "type": 1
+    },
+    {
+        "id": "8c4731f1a5288444bb2510ff8d967cc3",
+        "text": "Windows 11",
+        "type": 1
+    },
+    {
+        "id": "45e93473aa657374f58358beb5b4c05a",
+        "text": "der Gl\u00fccksminister",
+        "type": 1
+    },
+    {
+        "id": "62d9c64a934f4bc0b0ae420d8b346f01",
+        "text": "Daumen hoch geben weil man nicht aufgepasst hat",
+        "type": 1
+    },
+    {
+        "id": "943771a0d57e063599b939d9b0c8756f",
+        "text": "Kruses Gruseldemo",
+        "type": 1
+    },
+    {
+        "id": "2dcfca751b3d19327769efca3e4359ff",
+        "text": "Lindner",
+        "type": 1
+    },
+    {
+        "id": "ba2b37f19ba735f23ce71cb133ea4e5d",
+        "text": "Putin",
         "type": 1
     }
 ]
