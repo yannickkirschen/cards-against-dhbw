@@ -45,3 +45,7 @@ BWLer
 Stimmen Sie mir zu?
 die 3. Dimension
 ganz genießbar
+Frontend Code
+Breaking Changes am letzten Tag
+Teammitglieder mit 20% Wertung
+Moodle

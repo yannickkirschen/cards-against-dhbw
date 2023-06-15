@@ -120,6 +120,26 @@
         "type": 0
     },
     {
+        "id": "c3cfd5835d618f9ed0570923073a1baf",
+        "text": "Der SSH Key der Vorlesungsplanseite befindet sich in _.",
+        "type": 0
+    },
+    {
+        "id": "5a76341c3a98422a760704d3fe6528ef",
+        "text": "In Moodle findet man zwischen Vorlessungsmaterialien auch _.",
+        "type": 0
+    },
+    {
+        "id": "80b5d729dd5c38b070c365dd9ef087de",
+        "text": "Warum klappts?",
+        "type": 0
+    },
+    {
+        "id": "13cf10c7217dbc940a79819871d4907e",
+        "text": "Linux ist wirklich cool! Ich muss nur _ machen um ein Spiel zu starten.",
+        "type": 0
+    },
+    {
         "id": "9ae8dedd1d74ef74195db1a3743c388c",
         "text": "Hofi",
         "type": 1
@@ -352,6 +372,26 @@
     {
         "id": "e096a3960c34e82da07ad0ba178855f4",
         "text": "ganz genie\u00dfbar",
+        "type": 1
+    },
+    {
+        "id": "74755c7c2f5d276f5e1c93b15680afff",
+        "text": "Frontend Code",
+        "type": 1
+    },
+    {
+        "id": "a8b0fe67cd2e66af59682b407fa83f2f",
+        "text": "Breaking Changes am letzten Tag",
+        "type": 1
+    },
+    {
+        "id": "ebc38d72ed50be69b5bd294c053f2526",
+        "text": "Teammitglieder mit 20% Wertung",
+        "type": 1
+    },
+    {
+        "id": "f2ecf4050b36345ed454e50a6c41f7ee",
+        "text": "Moodle",
         "type": 1
     }
 ]

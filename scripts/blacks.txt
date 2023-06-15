@@ -22,3 +22,7 @@ Was hebt die Stimmung in jeder Vorlesung?
 Das Einzige, was schlimmer ist als eine Java-Vorlesung am Freitag, ist _
 “Da werden Sie öfters im Job drüber stolpern, dass Sie wissen müssen, was _ ist” - DB
 Wirtschaften ist der sorgsame Umgang mit _
+Der SSH Key der Vorlesungsplanseite befindet sich in _.
+In Moodle findet man zwischen Vorlessungsmaterialien auch _.
+Warum klappts?
+Linux ist wirklich cool! Ich muss nur _ machen um ein Spiel zu starten.
